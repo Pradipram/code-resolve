@@ -1,18 +1,60 @@
 # code-resolve
 
-Save your code for revision, practice DSA and competitive programming problems, and level up your coding skills.
+Code-Resolve is a platform to save, revise, and practice DSA and competitive programming problems. Store problems by platform, difficulty, language, and code for easy tracking.
 
-## Local Development Setup
+---
 
-1. **Create a `.env` file** in the root of the project.
-   Use the provided `copy.env` as a reference for required environment variables.
+## 🚀 Features
 
-2. **Retrieve Clerk credentials** by logging into your [Clerk dashboard](https://clerk.dev/).
+- Save problems with metadata (name, link, platform, difficulty, status, language)
+- Auto-detect platform from URL (LeetCode, Codeforces, etc.)
+- Monaco-powered code editor with language highlighting
+- Clerk-based authentication to manage user-specific problems
+- PostgreSQL database with Prisma ORM
 
-3. **Start the development server**:
+---
+
+## 🛠️ Getting Started (Local Setup)
+
+1. **Clone the repo**
+
+```bash
+git clone https://github.com/your-username/code-resolve.git
+cd code-resolve
+```
+
+2. **Create `.env` file**
+   Use `copy.env` as a reference for required environment variables.
+
+3. **Install dependencies**
+
+```bash
+npm install
+```
+
+4. **Setup database**
+
+```bash
+npx prisma migrate dev
+```
+
+5. **Run the app**
 
 ```bash
 npm run dev
 ```
 
-The application should now be running locally at `http://localhost:3000`.
+Visit `http://localhost:3000`
+
+---
+
+## ✅ Tech Stack
+
+- Next.js App Router
+- Prisma + PostgreSQL (Neon)
+- Clerk for auth
+- React Hook Form + Zod
+- TailwindCSS + ShadCN UI
+- Monaco Editor
+
+---
