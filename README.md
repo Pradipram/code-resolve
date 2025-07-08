@@ -14,6 +14,17 @@ Code-Resolve is a platform to save, revise, and practice DSA and competitive pro
 
 ---
 
+## ✅ Tech Stack
+
+- Next.js App Router
+- Prisma + PostgreSQL (Neon)
+- Clerk for auth
+- React Hook Form + Zod
+- TailwindCSS + ShadCN UI
+- Monaco Editor
+
+---
+
 ## 🛠️ Getting Started (Local Setup)
 
 1. **Clone the repo**
@@ -45,16 +56,5 @@ npm run dev
 ```
 
 Visit `http://localhost:3000`
-
----
-
-## ✅ Tech Stack
-
-- Next.js App Router
-- Prisma + PostgreSQL (Neon)
-- Clerk for auth
-- React Hook Form + Zod
-- TailwindCSS + ShadCN UI
-- Monaco Editor
 
 ---
