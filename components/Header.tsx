@@ -3,6 +3,7 @@ import { useClerk, UserButton } from "@clerk/nextjs";
 import Image from "next/image";
 import React from "react";
 import { Button } from "./ui/button";
+import { ModeToggle } from "./ui/modeToggle";
 
 const Header = () => {
   const { isSignedIn } = useClerk();
@@ -31,13 +32,16 @@ const Header = () => {
           </a>
         </div>
       </div>
-      {isSignedIn ? (
-        <UserButton signInUrl="/sign-in" />
-      ) : (
-        <a href="/sign-in">
-          <Button variant={"outline"}>Sign In</Button>
-        </a>
-      )}
+      <div className="flex items-center space-x-4 ">
+        <ModeToggle />
+        {isSignedIn ? (
+          <UserButton signInUrl="/sign-in" />
+        ) : (
+          <a href="/sign-in">
+            <Button variant={"outline"}>Sign In</Button>
+          </a>
+        )}
+      </div>
     </header>
   );
 };
