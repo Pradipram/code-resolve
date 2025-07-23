@@ -1,10 +1,9 @@
 import React from "react";
-import Image from "next/image";
 import { Button } from "@/components/ui/button";
 
 const EmptyDashboard = () => {
   return (
-    <div className="flex flex-col items-center justify-center p-8 rounded-lg border border-dashed border-gray-300 dark:border-gray-700 min-h-[400px] w-full">
+    <div className="flex flex-col items-center justify-center p-8 rounded-lg border border-dashed border-gray-300 dark:border-gray-700 min-h-[400px] w-[600px]">
       <div className="flex flex-col items-center max-w-md text-center space-y-6">
         <div className="rounded-full bg-blue-100 dark:bg-blue-900 p-3">
           <svg

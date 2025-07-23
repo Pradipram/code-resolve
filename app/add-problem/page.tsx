@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/card";
 import MonacoEditor from "@/components/ui/MonacoEditor";
 import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
 
 // Form validation schema
 const formSchema = z.object({
@@ -40,7 +41,7 @@ const formSchema = z.object({
     z.enum(["easy", "medium", "hard"]),
     z.number().int().positive(),
   ]),
-  status: z.enum(["done", "revisit", "pending"]),
+  status: z.enum(["Solved", "Attempted", "Unresolved"]),
   language: z.enum(["cpp", "python", "java", "javascript", "c", "typescript"]),
   code: z.string().optional(),
 });
@@ -94,9 +95,9 @@ const formArrayList: FormArrayListItem[] = [
     name: "status",
     label: "Status",
     options: [
-      { value: "done", label: "Done" },
-      { value: "revisit", label: "Revisit" },
-      { value: "pending", label: "Pending" },
+      { value: "Solved", label: "Solved" },
+      { value: "Attempted", label: "Attempted" },
+      { value: "Unresolved", label: "Unresolved" },
     ],
   },
   {
@@ -116,6 +117,7 @@ const formArrayList: FormArrayListItem[] = [
 const AddProblem = () => {
   const [isPlatformCodeforces, setIsPlatformCodeforces] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   // Initialize form
   const form = useForm<z.infer<typeof formSchema>>({
@@ -125,7 +127,7 @@ const AddProblem = () => {
       problemLink: "",
       platform: "leetcode",
       level: "medium",
-      status: "pending",
+      status: "Unresolved",
       language: "cpp",
       code: "",
     },
@@ -146,6 +148,7 @@ const AddProblem = () => {
       form.setValue("platform", "codeforces");
     } else {
       form.setValue("level", "medium");
+      form.setValue("platform", "leetcode");
     }
   }, [platform, form]);
 
@@ -177,6 +180,15 @@ const AddProblem = () => {
 
   // Form submission handler
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    // Ensure level is always a string before sending to backend
+    const submitValues = {
+      ...values,
+      level:
+        typeof values.level === "number"
+          ? values.level.toString()
+          : values.level,
+    };
+    // console.log("Form submitted with values:", submitValues);
     setIsLoading(true);
     try {
       const res = await fetch("/api/problem", {
@@ -184,7 +196,7 @@ const AddProblem = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(values), // don't send user_id
+        body: JSON.stringify(submitValues), // don't send user_id
       });
 
       if (!res.ok) {
@@ -195,6 +207,7 @@ const AddProblem = () => {
       const data = await res.json();
       toast.success("Problem saved successfully!");
       form.reset();
+      router.push("/dashboard"); // Redirect to dashboard after successful submission
     } catch (err: any) {
       console.error("Submit error:", err);
       toast.error(err.message || "Something went wrong");
@@ -259,6 +272,7 @@ const AddProblem = () => {
                             <Input placeholder={item.placeholder} {...field} />
                           )}
                         </FormControl>
+                        <FormMessage />
                       </div>
                     </FormItem>
                   )}

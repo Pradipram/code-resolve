@@ -1,3 +1,24 @@
+export async function GET(req: Request) {
+  const { userId } = await auth();
+
+  if (!userId) {
+    return NextResponse.redirect(new URL("/sign-in", req.url));
+  }
+
+  try {
+    const problems = await prisma.problem.findMany({
+      where: { user_id: userId },
+      orderBy: { created_at: "desc" },
+    });
+    return NextResponse.json(problems);
+  } catch (error) {
+    console.error("Error fetching problems:", error);
+    return NextResponse.json(
+      { error: "Something went wrong" },
+      { status: 500 }
+    );
+  }
+}
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";

@@ -43,7 +43,7 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <Header />
-            <main className="flex-grow flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+            <main className="flex-grow flex bg-gradient-to-br from-blue-50 via-white to-purple-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
               {children}
             </main>
             <Footer />
