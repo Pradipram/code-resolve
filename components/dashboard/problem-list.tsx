@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import MonacoEditor from "@/components/ui/MonacoEditor";
 import { Button } from "@/components/ui/button";
+import DeleteAlertDialog from "./delete-alert-dialog";
+import { toast } from "react-toastify";
 
 export interface Problem {
   problem_id: number;
@@ -18,6 +19,7 @@ export interface Problem {
 
 interface ProblemListProps {
   problems: Problem[];
+  onDelete?: (problemId: number) => void;
 }
 
 const statusOptions = ["Unsolved", "Attempted", "Solved"];
@@ -27,30 +29,53 @@ function formatDate(dateStr: string) {
   return `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`;
 }
 
-const ProblemList: React.FC<ProblemListProps> = ({ problems }) => {
+const ProblemList: React.FC<ProblemListProps> = ({ problems, onDelete }) => {
   const [editedStatus, setEditedStatus] = useState<{ [key: number]: string }>(
     {}
   );
   const [saveEnabled, setSaveEnabled] = useState<{ [key: number]: boolean }>(
     {}
   );
+  const [saving, setSaving] = useState<{ [key: number]: boolean }>({});
 
   const handleStatusChange = (problemId: number, newStatus: string) => {
     setEditedStatus((prev) => ({ ...prev, [problemId]: newStatus }));
     setSaveEnabled((prev) => ({ ...prev, [problemId]: true }));
   };
 
-  const handleSave = (problemId: number) => {
-    // TODO: Implement save logic (API call)
-    setSaveEnabled((prev) => ({ ...prev, [problemId]: false }));
+  const handleSave = async (problemId: number) => {
+    const newStatus = editedStatus[problemId];
+    setSaving((prev) => ({ ...prev, [problemId]: true }));
+    try {
+      const res = await fetch("/api/problem", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ problem_id: problemId, status: newStatus }),
+      });
+      const result = await res.json();
+      if (res.ok) {
+        setSaveEnabled((prev) => ({ ...prev, [problemId]: false }));
+        toast.success("Status updated successfully");
+      } else {
+        toast.error(
+          result.error || res.statusText || "Failed to update status"
+        );
+      }
+    } catch (err) {
+      toast.error("Error updating status");
+    } finally {
+      setSaving((prev) => ({ ...prev, [problemId]: false }));
+    }
   };
 
   const handleDelete = (problemId: number) => {
-    // TODO: Implement delete logic (API call)
+    if (onDelete) onDelete(problemId);
   };
 
   return (
-    <div className="overflow-x-auto mt-4">
+    <div className="overflow-x-auto m-4">
       <table className="min-w-full border border-gray-300 dark:border-gray-700 rounded-lg">
         <thead>
           <tr className="bg-gray-100 dark:bg-gray-800">
@@ -95,13 +120,27 @@ const ProblemList: React.FC<ProblemListProps> = ({ problems }) => {
                   ))}
                 </select>
               </td>
-              <td className="px-4 py-2 min-w-[200px]">
-                <MonacoEditor
-                  value={problem.code || ""}
-                  language={problem.language || "javascript"}
-                  height="100"
-                  options={{ readOnly: true }}
-                />
+              <td className="px-4 py-2 text-center">
+                {/* Code icon: yellow if code exists, white if not */}
+                <span title="Code">
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill={
+                      problem.code && problem.code.trim() ? "#facc15" : "white"
+                    }
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="inline"
+                  >
+                    <rect x="3" y="3" width="18" height="18" rx="2" />
+                    <path d="M8 12l2-2-2-2" />
+                    <path d="M16 12l-2 2 2 2" />
+                  </svg>
+                </span>
               </td>
               <td className="px-4 py-2 text-center">
                 {/* Note icon: white if no note, yellow if note exists (placeholder) */}
@@ -112,7 +151,6 @@ const ProblemList: React.FC<ProblemListProps> = ({ problems }) => {
                     viewBox="0 0 24 24"
                     fill={"white"}
                     stroke="currentColor"
-                    strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     className="inline"
@@ -124,20 +162,20 @@ const ProblemList: React.FC<ProblemListProps> = ({ problems }) => {
               <td className="px-4 py-2">{formatDate(problem.created_at)}</td>
               <td className="px-4 py-2">{formatDate(problem.updated_at)}</td>
               <td className="px-4 py-2 flex gap-2">
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  onClick={() => handleDelete(problem.problem_id)}
-                >
-                  Delete
-                </Button>
+                <DeleteAlertDialog
+                  problemId={problem.problem_id}
+                  onDelete={handleDelete}
+                />
                 <Button
                   variant="default"
                   size="sm"
-                  disabled={!saveEnabled[problem.problem_id]}
+                  disabled={
+                    !saveEnabled[problem.problem_id] ||
+                    saving[problem.problem_id]
+                  }
                   onClick={() => handleSave(problem.problem_id)}
                 >
-                  Save
+                  {saving[problem.problem_id] ? "Saving..." : "Save"}
                 </Button>
               </td>
             </tr>
@@ -147,5 +185,4 @@ const ProblemList: React.FC<ProblemListProps> = ({ problems }) => {
     </div>
   );
 };
-
 export default ProblemList;

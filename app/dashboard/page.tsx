@@ -29,14 +29,16 @@ const Dashboard = () => {
     return <div>Loading...</div>;
   }
 
+  const handleDelete = (problemId: number) => {
+    setProblems((prev) => prev.filter((p: any) => p.problem_id !== problemId));
+  };
+
   return (
-    <div>
+    <div className="flex items-center justify-center w-full h-full min-w-screen">
       {problems && problems.length > 0 ? (
-        <ProblemList problems={problems} />
+        <ProblemList problems={problems} onDelete={handleDelete} />
       ) : (
-        <div className="flex items-center justify-center w-full h-full min-w-screen">
-          <EmptyDashboard />
-        </div>
+        <EmptyDashboard />
       )}
     </div>
   );

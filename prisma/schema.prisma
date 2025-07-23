@@ -14,8 +14,8 @@ datasource db {
 }
 
 model Problem {
-  problem_id   Int      @id @default(autoincrement())
-  user_id      String   // UUID from your auth system
+  problem_id   Int      @unique @default(autoincrement())
+  user_id      String
   problem_name String
   problem_link String
   platform     String
@@ -23,6 +23,9 @@ model Problem {
   status       String
   language     String
   code         String?
+  note         String?
   created_at   DateTime @default(now())
   updated_at   DateTime @default(now())
+
+  @@id([user_id, problem_link])
 }
