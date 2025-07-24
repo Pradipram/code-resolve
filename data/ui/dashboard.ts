@@ -1,0 +1,13 @@
+export const filterProblemsFeild = [
+  { id: "all-problems", label: "All Problems", checked: true },
+  { id: "codeforces", label: "Codeforces", checked: false },
+  { id: "leetcode", label: "LeetCode", checked: false },
+  { id: "codestudio", label: "CodeStudio", checked: false },
+  { id: "geeksforgeeks", label: "GeeksforGeeks", checked: false },
+  { id: "easy", label: "Easy", checked: false },
+  { id: "medium", label: "Medium", checked: false },
+  { id: "hard", label: "Hard", checked: false },
+  { id: "unsolved", label: "Unsolved", checked: false },
+  { id: "attempted", label: "Attempted", checked: false },
+  { id: "solved", label: "Solved", checked: false },
+];
