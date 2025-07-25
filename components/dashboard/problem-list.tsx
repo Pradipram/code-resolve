@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import DeleteAlertDialog from "./delete-alert-dialog";
 import { toast } from "react-toastify";
+import { Code, MessageSquare } from "lucide-react";
 
 export interface Problem {
   problem_id: number;
@@ -14,7 +15,7 @@ export interface Problem {
   code?: string;
   created_at: string;
   updated_at: string;
-  // note?: string; // to be added later
+  note?: string; // to be added later
 }
 
 interface ProblemListProps {
@@ -121,42 +122,33 @@ const ProblemList: React.FC<ProblemListProps> = ({ problems, onDelete }) => {
                 </select>
               </td>
               <td className="px-4 py-2 text-center">
-                {/* Code icon: yellow if code exists, white if not */}
-                <span title="Code">
-                  <svg
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill={
-                      problem.code && problem.code.trim() ? "#facc15" : "white"
-                    }
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="inline"
-                  >
-                    <rect x="3" y="3" width="18" height="18" rx="2" />
-                    <path d="M8 12l2-2-2-2" />
-                    <path d="M16 12l-2 2 2 2" />
-                  </svg>
-                </span>
+                {/* Code icon: yellow if code exists, white if not, with instant custom tooltip */}
+                <a href={`/${problem.problem_id}/view-code`}>
+                  <span className="inline-block relative group cursor-pointer">
+                    <Code
+                      color={
+                        problem.code && problem.code.trim()
+                          ? "#facc15"
+                          : "white"
+                      }
+                    />
+                    <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 px-2 py-1 rounded bg-black text-white text-xs opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-75 whitespace-nowrap z-10">
+                      View Code
+                    </span>
+                  </span>
+                </a>
               </td>
               <td className="px-4 py-2 text-center">
-                {/* Note icon: white if no note, yellow if note exists (placeholder) */}
-                <span title="Note">
-                  <svg
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill={"white"}
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="inline"
-                  >
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-                  </svg>
+                {/* Note icon: white if no note, yellow if note exists, with instant custom tooltip */}
+                <span className="inline-block relative group cursor-pointer">
+                  <MessageSquare
+                    color={
+                      problem.note && problem.note.trim() ? "#facc15" : "white"
+                    }
+                  />
+                  <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 px-2 py-1 rounded bg-black text-white text-xs opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-75 whitespace-nowrap z-10">
+                    View Note
+                  </span>
                 </span>
               </td>
               <td className="px-4 py-2">{formatDate(problem.created_at)}</td>

@@ -47,7 +47,7 @@ const Dashboard = () => {
               <h1 className="text-center">Your saved problems</h1>
               <ProblemList problems={problems} onDelete={handleDelete} />
             </div>
-            <div className="w-[350px] min-w-[300px] max-w-[400px] border-l border-gray-200 dark:border-white p-6 flex flex-col gap-2 items-center justify-center">
+            <div className="w-[350px] min-w-[300px] max-w-[400px] border-l border-gray-200 dark:border-white px-6 flex flex-col gap-2 items-center justify-center">
               <SearchInput />
               <div className="w-full justify-center items-center p-2 gap-2 border rounded ">
                 <h4 className="text-center">Filter Problems</h4>
