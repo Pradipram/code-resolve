@@ -14,7 +14,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { AddCodeFormSchema } from "@/zod-schemas/add-code";
-import { AddCodeFormFields } from "@/data/ui/add-code";
+import { AddCodeFormFields, extToLang } from "@/data/ui/add-code";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
@@ -46,14 +46,26 @@ const AddCodePage = () => {
     },
   });
 
+  // Handle file upload, set code and language in form
   const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    const extension = file.name.split(".").pop()?.toLowerCase();
+    // Map file extension to language
+    const detectedLang =
+      extension && extToLang[extension] ? extToLang[extension] : undefined;
     const reader = new FileReader();
-    // reader.onload = (event) => {
-    //   setCode(event.target?.result as string);
-    // };
+    reader.onload = (event) => {
+      if (detectedLang) {
+        AddCodeForm.setValue("language", detectedLang);
+        console.log("Detected language:", detectedLang);
+      }
+      const text = event.target?.result as string;
+      AddCodeForm.setValue("code", text || "");
+    };
     reader.readAsText(file);
+    // Reset input so same file can be uploaded again if needed
+    e.target.value = "";
   };
 
   const handleAdd = async (values: z.infer<typeof AddCodeFormSchema>) => {
@@ -110,14 +122,16 @@ const AddCodePage = () => {
                   <div className="w-3/4">
                     <FormControl>
                       {/* Only one child allowed for FormControl, so use a fragment and conditional rendering */}
-                      <div>
+                      <div className="flex items-center gap-2">
                         {item.type === "input" && (
                           <Input placeholder={item.placeholder} {...field} />
                         )}
                         {item.type === "select" && (
                           <Select
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
+                            // onValueChange={field.onChange}
+                            // defaultValue={field.value}
+                            value={field.value}
+                            onValueChange={(value) => field.onChange(value)}
                           >
                             <SelectTrigger>
                               <SelectValue
@@ -139,13 +153,31 @@ const AddCodePage = () => {
                           <Textarea {...field} placeholder={item.placeholder} />
                         )}
                         {item.type === "code" && (
-                          <MonacoEditor
-                            value={field.value}
-                            language={AddCodeForm.watch("language")}
-                            height="200px"
-                            theme="vs-dark"
-                            onChange={(value) => field.onChange(value || "")}
-                          />
+                          <div className="flex-col w-full">
+                            <MonacoEditor
+                              value={field.value}
+                              language={AddCodeForm.watch("language")}
+                              height="200px"
+                              theme="vs-dark"
+                              onChange={(value) => field.onChange(value || "")}
+                            />
+                            <Button
+                              type="button"
+                              variant="link"
+                              size="sm"
+                              className="ml-2"
+                              onClick={() => fileInputRef.current?.click()}
+                            >
+                              Add code from file
+                            </Button>
+                            <input
+                              ref={fileInputRef}
+                              type="file"
+                              accept=".txt,.cpp,.py,.js,.ts,.java,.c,.cs,.go,.rb,.rs,.swift,.kt,.php,.sh,.json,.md,.html,.css,.xml,.sql,.yaml,.yml,.pl,.r,.scala,.dart,.m,.vb,.lua,.hs,.jl,.tsx,.jsx"
+                              style={{ display: "none" }}
+                              onChange={handleUpload}
+                            />
+                          </div>
                         )}
                       </div>
                     </FormControl>

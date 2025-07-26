@@ -33,6 +33,30 @@ enum CodeLanguage {
   java
   c
   typescript
+  csharp
+  go
+  ruby
+  rust
+  swift
+  kotlin
+  php
+  shell
+  json
+  markdown
+  html
+  css
+  xml
+  sql
+  yaml
+  perl
+  r
+  scala
+  dart
+  objective-c
+  vb
+  lua
+  haskell
+  julia
 }
 
 model Problem {
