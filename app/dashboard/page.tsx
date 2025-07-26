@@ -38,14 +38,21 @@ const Dashboard = () => {
     setProblems((prev) => prev.filter((p: any) => p.problem_id !== problemId));
   };
 
+  // Sort problems by updated_at descending
+  const sortedProblems = [...problems].sort((a: any, b: any) => {
+    const aDate = new Date(a.updated_at).getTime();
+    const bDate = new Date(b.updated_at).getTime();
+    return bDate - aDate;
+  });
+
   return (
     <div className="flex w-full h-full min-w-screen">
       <div className="flex-1">
-        {problems && problems.length > 0 ? (
+        {sortedProblems && sortedProblems.length > 0 ? (
           <div className="flex flex-row p-4 gap-4 w-full">
             <div className="flex-1">
               <h1 className="text-center">Your saved problems</h1>
-              <ProblemList problems={problems} onDelete={handleDelete} />
+              <ProblemList problems={sortedProblems} onDelete={handleDelete} />
             </div>
             <div className="w-[350px] min-w-[300px] max-w-[400px] border-l border-gray-200 dark:border-white px-6 flex flex-col gap-2 items-center justify-center">
               <SearchInput />

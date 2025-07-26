@@ -5,22 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
+import { Form } from "@/components/ui/form";
 import {
   Card,
   CardContent,
@@ -28,10 +13,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import MonacoEditor from "@/components/ui/MonacoEditor";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { formArrayList } from "@/data/ui/add-problem";
+import { generateFormUI } from "@/lib/generateFormUI";
 import { AddProblemFormSchema } from "@/zod-schemas/schemas";
 
 // Form validation schema
@@ -99,7 +84,9 @@ const AddProblem = () => {
       toast.success("Problem saved successfully!");
       form.reset();
       console.log("Problem added:", data);
-      router.push(`/code/${data.problem_id}/add-code?from=add-problem`); // Redirect to add code page after successful submission
+      router.push(
+        `/code/${data.problem_id}/add-code?from=add-problem&problem_name=${data.problem_name}`
+      ); // Redirect to add code page after successful submission
     } catch (err: any) {
       console.error("Submit error:", err);
       toast.error(err.message || "Something went wrong");
@@ -120,56 +107,10 @@ const AddProblem = () => {
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              {formArrayList.map((item) => (
-                <FormField
-                  key={item.name}
-                  control={form.control}
-                  name={item.name}
-                  render={({ field }) => (
-                    <FormItem className="flex items-center gap-4">
-                      <FormLabel className="w-1/3 text-right">
-                        {item.label}
-                      </FormLabel>
-                      <div className="w-2/3">
-                        <FormControl>
-                          {item.name === "level" && isCodeforces ? (
-                            <Input
-                              type="number"
-                              placeholder="800"
-                              {...field}
-                              min={800}
-                              max={4000}
-                              className="w-full"
-                            />
-                          ) : item.options ? (
-                            <Select
-                              value={field.value}
-                              onValueChange={(value) => field.onChange(value)}
-                            >
-                              <SelectTrigger>
-                                <SelectValue placeholder={item.label} />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {item.options.map((option) => (
-                                  <SelectItem
-                                    key={option.value}
-                                    value={option.value}
-                                  >
-                                    {option.label}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          ) : (
-                            <Input placeholder={item.placeholder} {...field} />
-                          )}
-                        </FormControl>
-                        <FormMessage />
-                      </div>
-                    </FormItem>
-                  )}
-                />
-              ))}
+              {generateFormUI({
+                form: form,
+                fields: formArrayList,
+              })}
 
               <div className="flex justify-center">
                 <Button

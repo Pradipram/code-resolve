@@ -35,11 +35,20 @@ const page = () => {
 
   const hasCodes = Array.isArray(problem.codes) && problem.codes.length > 0;
 
+  // Sort codes by updated_at descending
+  const sortedCodes = hasCodes
+    ? [...problem.codes].sort((a: any, b: any) => {
+        const aDate = new Date(a.updated_at).getTime();
+        const bDate = new Date(b.updated_at).getTime();
+        return bDate - aDate;
+      })
+    : [];
+
   return (
     <div className="flex flex-col flex-grow w-full min-h-0">
       {hasCodes ? (
         <CodeList
-          codes={problem.codes}
+          codes={sortedCodes}
           problem_id={problem_id as string | number}
           problem_name={problem.problem_name || ""}
         />

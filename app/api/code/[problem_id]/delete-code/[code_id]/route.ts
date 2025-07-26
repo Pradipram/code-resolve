@@ -17,6 +17,13 @@ export async function DELETE(
     if (deleted.count === 0) {
       return NextResponse.json({ error: "Code not found" }, { status: 404 });
     }
+
+    // Update the updated_at of the related problem
+    await prisma.problem.update({
+      where: { problem_id: Number(params.problem_id) },
+      data: { updated_at: new Date() },
+    });
+
     return NextResponse.json({ success: true });
   } catch (error) {
     return NextResponse.json(

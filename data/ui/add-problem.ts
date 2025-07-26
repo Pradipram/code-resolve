@@ -6,25 +6,29 @@ export type FormFieldName =
   | "status"
   | "note";
 
-export type FormArrayListItem = {
+export interface FormArrayListItem {
+  type: string;
   name: FormFieldName;
   label: string;
   placeholder?: string;
   options?: { value: string; label: string }[];
-};
+}
 
 export const formArrayList: FormArrayListItem[] = [
   {
+    type: "input",
     name: "problemName",
     label: "Problem Name",
     placeholder: "Two Sum",
   },
   {
+    type: "input",
     name: "problemLink",
     label: "Problem Link",
     placeholder: "https://leetcode.com/problems/two-sum/",
   },
   {
+    type: "select",
     name: "platform",
     label: "Platform",
     options: [
@@ -35,6 +39,7 @@ export const formArrayList: FormArrayListItem[] = [
     ],
   },
   {
+    type: "select",
     name: "level",
     label: "Difficulty Level",
     options: [
@@ -44,6 +49,7 @@ export const formArrayList: FormArrayListItem[] = [
     ],
   },
   {
+    type: "select",
     name: "status",
     label: "Status",
     options: [
@@ -53,6 +59,7 @@ export const formArrayList: FormArrayListItem[] = [
     ],
   },
   {
+    type: "textarea",
     name: "note",
     label: "Note (optional)",
     placeholder: "Enter any additional notes or observations",

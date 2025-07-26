@@ -18,6 +18,13 @@ export async function POST(
         code: body.code,
       },
     });
+
+    // Also update the updated_at of the related problem
+    await prisma.problem.update({
+      where: { problem_id: Number(problem_id) },
+      data: { updated_at: new Date() },
+    });
+
     return NextResponse.json(newCode);
   } catch (error) {
     return NextResponse.json({ error: "Failed to add code" }, { status: 500 });

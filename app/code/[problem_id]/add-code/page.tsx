@@ -1,32 +1,15 @@
 "use client";
 
-import React, { useState, useRef } from "react";
-import MonacoEditor from "@/components/ui/MonacoEditor";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { Form } from "@/components/ui/form";
 import { AddCodeFormSchema } from "@/zod-schemas/schemas";
 import { AddCodeFormFields, extToLang } from "@/data/ui/add-code";
 import { generateFormUI } from "@/lib/generateFormUI";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 import { toast } from "react-toastify";
 
 const AddCodePage = () => {
@@ -36,7 +19,6 @@ const AddCodePage = () => {
   const problemName = searchParams.get("problem_name") || "";
   const { problem_id } = useParams();
   const [isLoading, setIsLoading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const AddCodeForm = useForm<z.infer<typeof AddCodeFormSchema>>({
     resolver: zodResolver(AddCodeFormSchema),
@@ -47,28 +29,6 @@ const AddCodePage = () => {
       code: "",
     },
   });
-
-  // Handle file upload, set code and language in form
-  const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const extension = file.name.split(".").pop()?.toLowerCase();
-    // Map file extension to language
-    const detectedLang =
-      extension && extToLang[extension] ? extToLang[extension] : undefined;
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      if (detectedLang) {
-        AddCodeForm.setValue("language", detectedLang);
-        console.log("Detected language:", detectedLang);
-      }
-      const text = event.target?.result as string;
-      AddCodeForm.setValue("code", text || "");
-    };
-    reader.readAsText(file);
-    // Reset input so same file can be uploaded again if needed
-    e.target.value = "";
-  };
 
   const handleAdd = async (values: z.infer<typeof AddCodeFormSchema>) => {
     setIsLoading(true);
@@ -124,8 +84,6 @@ const AddCodePage = () => {
           {generateFormUI({
             form: AddCodeForm,
             fields: AddCodeFormFields,
-            fileInputRef,
-            handleUpload,
           })}
           <div className="flex justify-center gap-4">
             <Button type="submit">

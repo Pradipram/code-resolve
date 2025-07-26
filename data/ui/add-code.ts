@@ -39,8 +39,6 @@ interface AddCodeField {
   label: string;
   placeholder?: string;
   options?: string[];
-  min?: number;
-  max?: number;
 }
 
 export const AddCodeFormFields: AddCodeField[] = [
@@ -61,8 +59,6 @@ export const AddCodeFormFields: AddCodeField[] = [
     label: "Note",
     name: "note",
     placeholder: "Enter any additional notes(optional)",
-    min: 800,
-    max: 4000,
   },
   {
     type: "code",

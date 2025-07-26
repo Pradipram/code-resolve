@@ -80,7 +80,11 @@ const CodeList: React.FC<CodeListProps> = ({
             </div>
             {/* Edit and Delete icons at bottom right */}
             <div className="absolute right-2 bottom-2 flex gap-2">
-              <a href={`/code/${problem_id}/edit-code/${code.code_id}`}>
+              <a
+                href={`/code/edit-code/${
+                  code.code_id
+                }?problem_name=${encodeURIComponent(problem_name)}`}
+              >
                 <Button variant="ghost" size="icon" title="Edit Code">
                   <Edit className="w-4 h-4" />
                 </Button>
