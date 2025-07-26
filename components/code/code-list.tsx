@@ -1,5 +1,7 @@
 import { Plus, Edit, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
 
 interface CodeListProps {
   codes: Array<any>;
@@ -12,12 +14,28 @@ const CodeList: React.FC<CodeListProps> = ({
   problem_id,
   problem_name,
 }) => {
-  const handleDelete = async (codeId: number) => {
-    // TO DO: Implement delete functionality
+  const router = useRouter();
+
+  const handleDelete = async (codeId: string) => {
+    if (!confirm("Are you sure you want to delete this code?")) return;
+    try {
+      const res = await fetch(`/api/code/${problem_id}/delete-code/${codeId}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        toast.error(err?.error || "Failed to delete code");
+        return;
+      }
+      toast.success("Code deleted successfully");
+      router.refresh();
+    } catch (err) {
+      toast.error("Failed to delete code");
+    }
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto mt-2">
+    <div className="w-full max-w-2xl mx-auto m-4">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-bold text-center w-full">
           Code List for <span className="text-gray-500">[{problem_name}]</span>
@@ -37,11 +55,11 @@ const CodeList: React.FC<CodeListProps> = ({
           </Button>
         </a>
       </div>
-      <ul className="divide-y divide-gray-200 dark:divide-gray-700 border rounded-lg shadow-lg">
+      <ul className="divide-y divide-gray-200 dark:divide-gray-700 flex flex-col gap-6">
         {codes.map((code: any) => (
           <li
             key={code.code_id}
-            className="py-4 px-2 flex flex-col gap-1 relative"
+            className="py-4 px-2 flex flex-col gap-1 relative border rounded-lg shadow-lg"
           >
             <div className="flex justify-between items-center">
               <span className="font-semibold">{code.title}</span>
@@ -49,7 +67,7 @@ const CodeList: React.FC<CodeListProps> = ({
                 {code.language}
               </span>
             </div>
-            <pre className="bg-gray-100 dark:bg-gray-800 rounded p-2 text-xs overflow-x-auto max-h-40">
+            <pre className="bg-gray-100 dark:bg-gray-800 rounded p-2 text-xs overflow-x-auto max-h-100">
               {code.code}
             </pre>
             {code.note && (

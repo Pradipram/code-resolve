@@ -24,7 +24,7 @@ export const languageOptions: string[] = [
   "r",
   "scala",
   "dart",
-  "objective-c",
+  "objectivec",
   "vb",
   "lua",
   "haskell",

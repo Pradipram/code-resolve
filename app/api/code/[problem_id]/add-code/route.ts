@@ -1,13 +1,12 @@
-import { PrismaClient } from "@prisma/client";
+import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
-
-const prisma = new PrismaClient();
 
 export async function POST(
   req: Request,
   { params }: { params: { problem_id: string } }
 ) {
   const { problem_id } = params;
+  console.log("Adding code for problem_id:", problem_id);
   try {
     const body = await req.json();
     const newCode = await prisma.code.create({

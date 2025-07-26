@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/form";
 import { AddCodeFormSchema } from "@/zod-schemas/schemas";
 import { AddCodeFormFields, extToLang } from "@/data/ui/add-code";
+import { generateFormUI } from "@/lib/generateFormUI";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
@@ -23,9 +24,10 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
-import { SelectValue } from "@radix-ui/react-select";
 import { Textarea } from "@/components/ui/textarea";
+import { toast } from "react-toastify";
 
 const AddCodePage = () => {
   const router = useRouter();
@@ -71,20 +73,30 @@ const AddCodePage = () => {
   const handleAdd = async (values: z.infer<typeof AddCodeFormSchema>) => {
     setIsLoading(true);
     try {
-      const res = await fetch(`/api/code/${problem_id}`, {
+      const res = await fetch(`/api/code/${problem_id}/add-code`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(values),
       });
-      if (!res.ok) throw new Error("Failed to add code");
+      console.log("Response:", res);
+      if (!res.ok) {
+        if (res.status === 500) {
+          toast.error("Internal server error. Please try again later.");
+        } else throw new Error("Failed to add code");
+      }
       // Optionally show toast
-      if (from === "add-problem") {
-        router.push("/dashboard");
-      } else {
-        router.push(`/code/${problem_id}/view-code`);
+      else {
+        toast.success("Code added successfully");
+        if (from === "add-problem") {
+          router.push("/dashboard");
+        } else {
+          router.push(`/code/${problem_id}/view-code`);
+        }
       }
     } catch (err) {
       // Optionally show error toast
+      toast.error("Something went wrong");
+      console.error("Error adding code:", err);
     } finally {
       setIsLoading(false);
     }
@@ -109,84 +121,12 @@ const AddCodePage = () => {
           onSubmit={AddCodeForm.handleSubmit(handleAdd)}
           className="space-y-6"
         >
-          {AddCodeFormFields.map((item) => (
-            <FormField
-              key={item.name}
-              control={AddCodeForm.control}
-              name={item.name}
-              render={({ field }) => (
-                <FormItem className="flex items-center gap-4 w-full">
-                  <FormLabel className="w-1/4 text-center gap-4">
-                    {item.label}
-                  </FormLabel>
-                  <div className="w-3/4">
-                    <FormControl>
-                      {/* Only one child allowed for FormControl, so use a fragment and conditional rendering */}
-                      <div className="flex items-center gap-2">
-                        {item.type === "input" && (
-                          <Input placeholder={item.placeholder} {...field} />
-                        )}
-                        {item.type === "select" && (
-                          <Select
-                            // onValueChange={field.onChange}
-                            // defaultValue={field.value}
-                            value={field.value}
-                            onValueChange={(value) => field.onChange(value)}
-                          >
-                            <SelectTrigger>
-                              <SelectValue
-                                placeholder={
-                                  item.placeholder || "Choose an option"
-                                }
-                              />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {item.options?.map((option) => (
-                                <SelectItem key={option} value={option}>
-                                  {option}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        )}
-                        {item.type === "textarea" && (
-                          <Textarea {...field} placeholder={item.placeholder} />
-                        )}
-                        {item.type === "code" && (
-                          <div className="flex-col w-full">
-                            <MonacoEditor
-                              value={field.value}
-                              language={AddCodeForm.watch("language")}
-                              height="200px"
-                              theme="vs-dark"
-                              onChange={(value) => field.onChange(value || "")}
-                            />
-                            <Button
-                              type="button"
-                              variant="link"
-                              size="sm"
-                              className="ml-2"
-                              onClick={() => fileInputRef.current?.click()}
-                            >
-                              Add code from file
-                            </Button>
-                            <input
-                              ref={fileInputRef}
-                              type="file"
-                              accept=".txt,.cpp,.py,.js,.ts,.java,.c,.cs,.go,.rb,.rs,.swift,.kt,.php,.sh,.json,.md,.html,.css,.xml,.sql,.yaml,.yml,.pl,.r,.scala,.dart,.m,.vb,.lua,.hs,.jl,.tsx,.jsx"
-                              style={{ display: "none" }}
-                              onChange={handleUpload}
-                            />
-                          </div>
-                        )}
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </div>
-                </FormItem>
-              )}
-            />
-          ))}
+          {generateFormUI({
+            form: AddCodeForm,
+            fields: AddCodeFormFields,
+            fileInputRef,
+            handleUpload,
+          })}
           <div className="flex justify-center gap-4">
             <Button type="submit">
               {isLoading ? "Adding..." : "Add Code"}

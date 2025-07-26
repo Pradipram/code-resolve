@@ -52,7 +52,7 @@ enum CodeLanguage {
   r
   scala
   dart
-  objective-c
+  objectivec
   vb
   lua
   haskell
