@@ -123,7 +123,7 @@ const ProblemList: React.FC<ProblemListProps> = ({ problems, onDelete }) => {
               </td>
               <td className="px-4 py-2 text-center">
                 {/* Code icon: yellow if code exists, white if not, with instant custom tooltip */}
-                <a href={`/${problem.problem_id}/view-code`}>
+                <a href={`/code/${problem.problem_id}/view-code`}>
                   <span className="inline-block relative group cursor-pointer">
                     <Code
                       color={

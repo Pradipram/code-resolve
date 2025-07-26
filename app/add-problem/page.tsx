@@ -31,6 +31,7 @@ import {
 import MonacoEditor from "@/components/ui/MonacoEditor";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
+import { formArrayList } from "@/data/ui/add-problem";
 
 // Form validation schema
 const formSchema = z.object({
@@ -39,83 +40,12 @@ const formSchema = z.object({
   platform: z.enum(["codeforces", "leetcode", "geeksforgeeks", "codestudio"]),
   level: z.union([
     z.enum(["easy", "medium", "hard"]),
-    z.number().int().positive(),
+    z.string().regex(/^[0-9]+$/, "Enter a valid number"),
   ]),
   status: z.enum(["Solved", "Attempted", "Unresolved"]),
-  language: z.enum(["cpp", "python", "java", "javascript", "c", "typescript"]),
-  code: z.string().optional(),
 });
 
-type FormFieldName =
-  | "problemName"
-  | "problemLink"
-  | "platform"
-  | "level"
-  | "status"
-  | "language"
-  | "code";
-type FormArrayListItem = {
-  name: FormFieldName;
-  label: string;
-  placeholder?: string;
-  options?: { value: string; label: string }[];
-};
-
-const formArrayList: FormArrayListItem[] = [
-  {
-    name: "problemName",
-    label: "Problem Name",
-    placeholder: "Two Sum",
-  },
-  {
-    name: "problemLink",
-    label: "Problem Link",
-    placeholder: "https://leetcode.com/problems/two-sum/",
-  },
-  {
-    name: "platform",
-    label: "Platform",
-    options: [
-      { value: "leetcode", label: "LeetCode" },
-      { value: "codeforces", label: "Codeforces" },
-      { value: "geeksforgeeks", label: "GeeksforGeeks" },
-      { value: "codestudio", label: "CodeStudio" },
-    ],
-  },
-  {
-    name: "level",
-    label: "Difficulty Level",
-    options: [
-      { value: "easy", label: "Easy" },
-      { value: "medium", label: "Medium" },
-      { value: "hard", label: "Hard" },
-    ],
-  },
-  {
-    name: "status",
-    label: "Status",
-    options: [
-      { value: "Solved", label: "Solved" },
-      { value: "Attempted", label: "Attempted" },
-      { value: "Unresolved", label: "Unresolved" },
-    ],
-  },
-  {
-    name: "language",
-    label: "Language",
-    options: [
-      { value: "cpp", label: "C++" },
-      { value: "python", label: "Python" },
-      { value: "java", label: "Java" },
-      { value: "javascript", label: "JavaScript" },
-      { value: "c", label: "C" },
-      { value: "typescript", label: "TypeScript" },
-    ],
-  },
-];
-
 const AddProblem = () => {
-  const [isPlatformCodeforces, setIsPlatformCodeforces] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
@@ -128,55 +58,10 @@ const AddProblem = () => {
       platform: "leetcode",
       level: "medium",
       status: "Unresolved",
-      language: "cpp",
-      code: "",
     },
   });
 
-  // Watch for platform changes
-  const platform = form.watch("platform");
-  const problemLink = form.watch("problemLink");
-
-  // Update level field based on platform
-  useEffect(() => {
-    const isCodeforces = platform === "codeforces";
-    setIsPlatformCodeforces(isCodeforces);
-
-    // Reset level value when switching platforms
-    if (isCodeforces) {
-      form.setValue("level", 800);
-      form.setValue("platform", "codeforces");
-    } else {
-      form.setValue("level", "medium");
-      form.setValue("platform", "leetcode");
-    }
-  }, [platform, form]);
-
-  // Try to detect platform from URL
-  useEffect(() => {
-    if (!problemLink) return;
-
-    try {
-      const url = new URL(problemLink);
-      if (url.hostname.includes("leetcode")) {
-        form.setValue("platform", "leetcode");
-      } else if (url.hostname.includes("codeforces")) {
-        form.setValue("platform", "codeforces");
-      } else if (
-        url.hostname.includes("geeksforgeeks") ||
-        url.hostname.includes("gfg")
-      ) {
-        form.setValue("platform", "geeksforgeeks");
-      } else if (
-        url.hostname.includes("codingninjas") ||
-        url.hostname.includes("codestudio")
-      ) {
-        form.setValue("platform", "codestudio");
-      }
-    } catch (e) {
-      // Invalid URL, do nothing
-    }
-  }, [problemLink, form]);
+  const isCodeforces = form.watch("platform") === "codeforces";
 
   // Form submission handler
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
@@ -184,9 +69,7 @@ const AddProblem = () => {
     const submitValues = {
       ...values,
       level:
-        typeof values.level === "number"
-          ? values.level.toString()
-          : values.level,
+        typeof values.level === "string" ? values.level : String(values.level),
     };
     // console.log("Form submitted with values:", submitValues);
     setIsLoading(true);
@@ -207,7 +90,8 @@ const AddProblem = () => {
       const data = await res.json();
       toast.success("Problem saved successfully!");
       form.reset();
-      router.push("/dashboard"); // Redirect to dashboard after successful submission
+      console.log("Problem added:", data);
+      router.push(`/code/${data.problem_id}/add-code?from=add-problem`); // Redirect to add code page after successful submission
     } catch (err: any) {
       console.error("Submit error:", err);
       toast.error(err.message || "Something went wrong");
@@ -240,7 +124,7 @@ const AddProblem = () => {
                       </FormLabel>
                       <div className="w-2/3">
                         <FormControl>
-                          {item.name === "level" && isPlatformCodeforces ? (
+                          {item.name === "level" && isCodeforces ? (
                             <Input
                               type="number"
                               placeholder="800"
@@ -278,34 +162,6 @@ const AddProblem = () => {
                   )}
                 />
               ))}
-
-              <FormField
-                control={form.control}
-                name="code"
-                render={({ field }) => (
-                  <FormItem className="flex items-start gap-4">
-                    <FormLabel className="w-1/3 text-right pt-2">
-                      Code
-                    </FormLabel>
-                    <div className="w-2/3">
-                      <FormControl className="h-50">
-                        <MonacoEditor
-                          height="350"
-                          language={form.watch("language")}
-                          theme="vs-dark"
-                          value={field.value}
-                          options={{
-                            minimap: { enabled: false },
-                            fontSize: 14,
-                          }}
-                          onChange={field.onChange}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </div>
-                  </FormItem>
-                )}
-              />
 
               <div className="flex justify-center">
                 <Button

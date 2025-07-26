@@ -4,6 +4,7 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
+// Function to handle adding a new problem
 export async function POST(req: Request) {
   const { userId } = await auth();
 
@@ -21,20 +22,20 @@ export async function POST(req: Request) {
         platform: body.platform,
         level: body.level.toString(),
         status: body.status,
-        language: body.language,
-        code: body.code || "",
       },
     });
 
     return NextResponse.json(newProblem);
   } catch (error) {
-    console.error("Error saving problem:", error);
+    console.error("Error Adding problem:", error);
     return NextResponse.json(
       { error: "Something went wrong" },
       { status: 500 }
     );
   }
 }
+
+// Function to handle deleting a problem
 export async function DELETE(req: Request) {
   const { userId } = await auth();
 
@@ -73,6 +74,8 @@ export async function DELETE(req: Request) {
     );
   }
 }
+
+// Function to get all problems for the authenticated user
 export async function GET(req: Request) {
   const { userId } = await auth();
 
@@ -94,6 +97,8 @@ export async function GET(req: Request) {
     );
   }
 }
+
+// Function to handle updating a problem
 export async function PUT(req: Request) {
   const { userId } = await auth();
 

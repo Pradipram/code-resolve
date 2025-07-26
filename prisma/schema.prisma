@@ -13,6 +13,28 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Code {
+  code_id     String   @id @default(uuid())
+  problem_id  Int
+  title       String
+  language    CodeLanguage
+  note        String?
+  code        String
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  Problem     Problem  @relation(fields: [problem_id], references: [problem_id])
+}
+
+enum CodeLanguage {
+  python
+  cpp
+  javascript
+  java
+  c
+  typescript
+}
+
 model Problem {
   problem_id   Int      @unique @default(autoincrement())
   user_id      String
@@ -21,8 +43,7 @@ model Problem {
   platform     String
   level        String
   status       String
-  language     String
-  code         String?
+  codes        Code[]
   note         String?
   created_at   DateTime @default(now())
   updated_at   DateTime @default(now())
