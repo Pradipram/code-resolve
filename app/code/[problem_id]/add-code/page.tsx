@@ -13,7 +13,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { AddCodeFormSchema } from "@/zod-schemas/add-code";
+import { AddCodeFormSchema } from "@/zod-schemas/schemas";
 import { AddCodeFormFields, extToLang } from "@/data/ui/add-code";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -99,7 +99,7 @@ const AddCodePage = () => {
   };
 
   return (
-    <div className="w-full max-w-lg rounded-xl border p-6 shadow bg-white dark:bg-gray-900 mx-auto my-6">
+    <div className="w-full max-w-3xl rounded-xl border p-6 shadow bg-white dark:bg-gray-900 mx-auto my-6">
       <h2 className="text-lg font-bold mb-4 text-center">
         Add code for your problem
         <span className="text-gray-500"> [{problemName}]</span>
@@ -187,9 +187,12 @@ const AddCodePage = () => {
               )}
             />
           ))}
-          <div className="flex justify-center">
+          <div className="flex justify-center gap-4">
             <Button type="submit">
               {isLoading ? "Adding..." : "Add Code"}
+            </Button>
+            <Button type="button" variant="outline" onClick={handleSkip}>
+              Skip
             </Button>
           </div>
         </form>

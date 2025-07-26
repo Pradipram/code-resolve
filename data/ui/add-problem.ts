@@ -3,7 +3,8 @@ export type FormFieldName =
   | "problemLink"
   | "platform"
   | "level"
-  | "status";
+  | "status"
+  | "note";
 
 export type FormArrayListItem = {
   name: FormFieldName;
@@ -50,5 +51,10 @@ export const formArrayList: FormArrayListItem[] = [
       { value: "Attempted", label: "Attempted" },
       { value: "Unresolved", label: "Unresolved" },
     ],
+  },
+  {
+    name: "note",
+    label: "Note (optional)",
+    placeholder: "Enter any additional notes or observations",
   },
 ];

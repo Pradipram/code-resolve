@@ -32,26 +32,17 @@ import MonacoEditor from "@/components/ui/MonacoEditor";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { formArrayList } from "@/data/ui/add-problem";
+import { AddProblemFormSchema } from "@/zod-schemas/schemas";
 
 // Form validation schema
-const formSchema = z.object({
-  problemName: z.string().min(3, "Problem name must be at least 3 characters"),
-  problemLink: z.string().url("Please enter a valid URL"),
-  platform: z.enum(["codeforces", "leetcode", "geeksforgeeks", "codestudio"]),
-  level: z.union([
-    z.enum(["easy", "medium", "hard"]),
-    z.string().regex(/^[0-9]+$/, "Enter a valid number"),
-  ]),
-  status: z.enum(["Solved", "Attempted", "Unresolved"]),
-});
 
 const AddProblem = () => {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
   // Initialize form
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof AddProblemFormSchema>>({
+    resolver: zodResolver(AddProblemFormSchema),
     defaultValues: {
       problemName: "",
       problemLink: "",
@@ -61,10 +52,27 @@ const AddProblem = () => {
     },
   });
 
+  // Auto-detect platform from problemLink
+  useEffect(() => {
+    const link = form.watch("problemLink");
+    if (!link) return;
+    let detected: string | undefined = undefined;
+    if (link.includes("codeforces.com")) detected = "codeforces";
+    else if (link.includes("leetcode.com")) detected = "leetcode";
+    else if (link.includes("geeksforgeeks.org")) detected = "geeksforgeeks";
+    else if (link.includes("codestudio")) detected = "codestudio";
+    if (detected && form.getValues("platform") !== detected) {
+      form.setValue(
+        "platform",
+        detected as "codeforces" | "leetcode" | "geeksforgeeks" | "codestudio"
+      );
+    }
+  }, [form.watch("problemLink")]);
+
   const isCodeforces = form.watch("platform") === "codeforces";
 
   // Form submission handler
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: z.infer<typeof AddProblemFormSchema>) => {
     // Ensure level is always a string before sending to backend
     const submitValues = {
       ...values,
@@ -135,8 +143,8 @@ const AddProblem = () => {
                             />
                           ) : item.options ? (
                             <Select
-                              onValueChange={field.onChange}
-                              defaultValue={field.value as string}
+                              value={field.value}
+                              onValueChange={(value) => field.onChange(value)}
                             >
                               <SelectTrigger>
                                 <SelectValue placeholder={item.label} />
