@@ -31,7 +31,7 @@ export enum CodeLanguage {
   julia = "julia",
 }
 
-export type CodeType = {
+export interface CodeInterface {
   code_id: string;
   problem_id: number;
   title: string;
@@ -40,4 +40,20 @@ export type CodeType = {
   code: string;
   created_at: string; // ISO string, or Date if you convert
   updated_at: string; // ISO string, or Date if you convert
-};
+}
+
+export type CodeType = CodeInterface;
+
+export interface ProblemInterface {
+  problem_id: number;
+  user_id: string;
+  problem_name: string;
+  problem_link: string;
+  platform: string;
+  level: string;
+  status: string;
+  codeCount: number;
+  note?: string | null;
+  created_at: string; // or Date
+  updated_at: string; // or Date
+}

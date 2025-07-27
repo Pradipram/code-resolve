@@ -84,9 +84,29 @@ export async function GET(req: Request) {
   try {
     const problems = await prisma.problem.findMany({
       where: { user_id: userId },
-      orderBy: { created_at: "desc" },
+      orderBy: { updated_at: "desc" },
+      select: {
+        problem_id: true,
+        user_id: true,
+        problem_name: true,
+        problem_link: true,
+        platform: true,
+        level: true,
+        status: true,
+        note: true,
+        created_at: true,
+        updated_at: true,
+        _count: {
+          select: { codes: true },
+        },
+      },
     });
-    return NextResponse.json(problems);
+    // Optionally, you can flatten _count.codes to codeCount for easier frontend use
+    const problemsWithCodeCount = problems.map((p) => ({
+      ...p,
+      codeCount: p._count.codes,
+    }));
+    return NextResponse.json(problemsWithCodeCount);
   } catch (error) {
     console.error("Error fetching problems:", error);
     return NextResponse.json(

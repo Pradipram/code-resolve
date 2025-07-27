@@ -10,4 +10,6 @@ export const filterProblemsFeild = [
   { id: "unsolved", label: "Unsolved", checked: false },
   { id: "attempted", label: "Attempted", checked: false },
   { id: "solved", label: "Solved", checked: false },
+  { id: "1 month older", label: "1 month older", checked: false },
+  { id: "3 month older", label: "3 month older", checked: false },
 ];

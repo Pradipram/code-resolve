@@ -1,25 +1,21 @@
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import DeleteAlertDialog from "./delete-alert-dialog";
 import { toast } from "react-toastify";
-import { Code, MessageSquare } from "lucide-react";
-
-export interface Problem {
-  problem_id: number;
-  problem_name: string;
-  problem_link: string;
-  platform: string;
-  level: string;
-  status: string;
-  language: string;
-  code?: string;
-  created_at: string;
-  updated_at: string;
-  note?: string; // to be added later
-}
+import { Code, MessageSquare, SquareCode } from "lucide-react";
+import { ProblemInterface } from "@/data/types";
 
 interface ProblemListProps {
-  problems: Problem[];
+  problems: ProblemInterface[];
   onDelete?: (problemId: number) => void;
 }
 
@@ -31,34 +27,42 @@ function formatDate(dateStr: string) {
 }
 
 const ProblemList: React.FC<ProblemListProps> = ({ problems, onDelete }) => {
-  const [editedStatus, setEditedStatus] = useState<{ [key: number]: string }>(
-    {}
-  );
-  const [saveEnabled, setSaveEnabled] = useState<{ [key: number]: boolean }>(
-    {}
-  );
   const [saving, setSaving] = useState<{ [key: number]: boolean }>({});
+  const [localProblems, setLocalProblems] =
+    useState<ProblemInterface[]>(problems);
 
-  const handleStatusChange = (problemId: number, newStatus: string) => {
-    setEditedStatus((prev) => ({ ...prev, [problemId]: newStatus }));
-    setSaveEnabled((prev) => ({ ...prev, [problemId]: true }));
-  };
+  // Note modal state
+  const router = useRouter();
+  const [noteModal, setNoteModal] = useState<{
+    open: boolean;
+    problem: ProblemInterface | null;
+    note: string;
+    saving: boolean;
+    editing: boolean;
+  }>({ open: false, problem: null, note: "", saving: false, editing: false });
 
-  const handleSave = async (problemId: number) => {
-    const newStatus = editedStatus[problemId];
+  // Update status in DB immediately on change
+  const handleStatusChange = async (problemId: number, newStatus: string) => {
     setSaving((prev) => ({ ...prev, [problemId]: true }));
     try {
       const res = await fetch("/api/problem", {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ problem_id: problemId, status: newStatus }),
       });
       const result = await res.json();
       if (res.ok) {
-        setSaveEnabled((prev) => ({ ...prev, [problemId]: false }));
-        toast.success("Status updated successfully");
+        setLocalProblems((prev) =>
+          prev.map((p) =>
+            p.problem_id === problemId
+              ? {
+                  ...p,
+                  status: newStatus,
+                  updated_at: new Date().toISOString(),
+                }
+              : p
+          )
+        );
       } else {
         toast.error(
           result.error || res.statusText || "Failed to update status"
@@ -73,6 +77,67 @@ const ProblemList: React.FC<ProblemListProps> = ({ problems, onDelete }) => {
 
   const handleDelete = (problemId: number) => {
     if (onDelete) onDelete(problemId);
+  };
+
+  // Open note modal
+  const handleOpenNote = (problem: ProblemInterface) => {
+    setNoteModal({
+      open: true,
+      problem,
+      note: problem.note || "",
+      saving: false,
+      editing: false,
+    });
+  };
+
+  // Save note
+  const handleSaveNote = async () => {
+    if (!noteModal.problem) return;
+    setNoteModal((prev) => ({ ...prev, saving: true }));
+    try {
+      const res = await fetch("/api/problem", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          problem_id: noteModal.problem.problem_id,
+          note: noteModal.note,
+        }),
+      });
+      const result = await res.json();
+      if (res.ok) {
+        toast.success("Note updated successfully");
+        // Update the local problems list with the new note and updated_at
+        setLocalProblems((prev) => {
+          return prev
+            .map((p) =>
+              p.problem_id === noteModal.problem!.problem_id
+                ? {
+                    ...p,
+                    note: noteModal.note,
+                    updated_at: new Date().toISOString(),
+                  }
+                : p
+            )
+            .sort(
+              (a, b) =>
+                new Date(b.updated_at).getTime() -
+                new Date(a.updated_at).getTime()
+            );
+        });
+        setNoteModal((prev) => ({
+          ...prev,
+          open: false,
+          saving: false,
+          editing: false,
+        }));
+      } else {
+        toast.error(result.error || res.statusText || "Failed to update note");
+        setNoteModal((prev) => ({ ...prev, saving: false }));
+      }
+    } catch (err) {
+      toast.error("Error updating note");
+      setNoteModal((prev) => ({ ...prev, saving: false }));
+    }
   };
 
   return (
@@ -92,7 +157,7 @@ const ProblemList: React.FC<ProblemListProps> = ({ problems, onDelete }) => {
           </tr>
         </thead>
         <tbody>
-          {problems.map((problem) => (
+          {localProblems.map((problem) => (
             <tr key={problem.problem_id} className="border-t">
               <td className="px-4 py-2">
                 <a
@@ -108,7 +173,7 @@ const ProblemList: React.FC<ProblemListProps> = ({ problems, onDelete }) => {
               <td className="px-4 py-2">{problem.level}</td>
               <td className="px-4 py-2">
                 <select
-                  value={editedStatus[problem.problem_id] ?? problem.status}
+                  value={problem.status}
                   onChange={(e) =>
                     handleStatusChange(problem.problem_id, e.target.value)
                   }
@@ -122,12 +187,12 @@ const ProblemList: React.FC<ProblemListProps> = ({ problems, onDelete }) => {
                 </select>
               </td>
               <td className="px-4 py-2 text-center">
-                {/* Code icon: yellow if code exists, white if not, with instant custom tooltip */}
+                {/* Code icon: yellow if at least one code exists and is non-empty, white if not, with instant custom tooltip */}
                 <a href={`/code/${problem.problem_id}/view-code`}>
                   <span className="inline-block relative group cursor-pointer">
-                    <Code
+                    <SquareCode
                       color={
-                        problem.code && problem.code.trim()
+                        problem.codeCount && problem.codeCount > 0
                           ? "#facc15"
                           : "white"
                       }
@@ -140,14 +205,22 @@ const ProblemList: React.FC<ProblemListProps> = ({ problems, onDelete }) => {
               </td>
               <td className="px-4 py-2 text-center">
                 {/* Note icon: white if no note, yellow if note exists, with instant custom tooltip */}
-                <span className="inline-block relative group cursor-pointer">
+                <span
+                  className="inline-block relative group cursor-pointer"
+                  onClick={() => handleOpenNote(problem)}
+                >
                   <MessageSquare
                     color={
                       problem.note && problem.note.trim() ? "#facc15" : "white"
                     }
+                    fill={
+                      problem.note && problem.note.trim() ? "#facc15" : "none"
+                    }
                   />
                   <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 px-2 py-1 rounded bg-black text-white text-xs opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-75 whitespace-nowrap z-10">
-                    View Note
+                    {problem.note && problem.note.trim()
+                      ? "View/Edit Note"
+                      : "Add Note"}
                   </span>
                 </span>
               </td>
@@ -158,22 +231,72 @@ const ProblemList: React.FC<ProblemListProps> = ({ problems, onDelete }) => {
                   problemId={problem.problem_id}
                   onDelete={handleDelete}
                 />
-                <Button
-                  variant="default"
-                  size="sm"
-                  disabled={
-                    !saveEnabled[problem.problem_id] ||
-                    saving[problem.problem_id]
-                  }
-                  onClick={() => handleSave(problem.problem_id)}
-                >
-                  {saving[problem.problem_id] ? "Saving..." : "Save"}
-                </Button>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
+      {/* Note Modal */}
+      <Dialog
+        open={noteModal.open}
+        onOpenChange={(open: boolean) =>
+          setNoteModal((prev) => ({ ...prev, open }))
+        }
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              Note for: {noteModal.problem?.problem_name}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="my-2">
+            {noteModal.problem?.note &&
+            noteModal.problem.note.trim() &&
+            !noteModal.editing ? (
+              <>
+                <div className="mb-2 text-gray-700 dark:text-gray-300">
+                  {noteModal.problem.note}
+                </div>
+                <DialogFooter>
+                  <Button
+                    onClick={() =>
+                      setNoteModal((prev) => ({ ...prev, editing: true }))
+                    }
+                    className="m-auto"
+                  >
+                    Edit
+                  </Button>
+                </DialogFooter>
+              </>
+            ) : (
+              <>
+                <div className="mb-2 text-gray-700 dark:text-gray-300">
+                  {noteModal.problem?.note && noteModal.problem.note.trim()
+                    ? "Edit your note below:"
+                    : "No note exists. Write a note below:"}
+                </div>
+                <Textarea
+                  value={noteModal.note}
+                  onChange={(e) =>
+                    setNoteModal((prev) => ({ ...prev, note: e.target.value }))
+                  }
+                  rows={5}
+                  className="w-full"
+                />
+                <DialogFooter>
+                  <Button
+                    onClick={handleSaveNote}
+                    disabled={noteModal.saving}
+                    className="mx-auto mt-2"
+                  >
+                    {noteModal.saving ? "Saving..." : "Save Note"}
+                  </Button>
+                </DialogFooter>
+              </>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
