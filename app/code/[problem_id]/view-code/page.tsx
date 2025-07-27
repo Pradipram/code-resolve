@@ -1,6 +1,7 @@
 "use client";
 import EmptyCode from "@/components/code/empty-code";
 import CodeList from "@/components/code/code-list";
+import PageLoader from "@/components/ui/PageLoader";
 import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
@@ -8,6 +9,7 @@ import { toast } from "react-toastify";
 const page = () => {
   const { problem_id } = useParams();
   const [problem, setProblem] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
@@ -19,18 +21,22 @@ const page = () => {
       return;
     }
     const fetchProblem = async () => {
+      setLoading(true);
       const response = await fetch(`/api/problem/${problem_id}`);
       if (!response.ok) {
         toast.error("Failed to fetch problem");
+        setLoading(false);
         return;
       }
       const data = await response.json();
       setProblem(data);
+      setLoading(false);
       // console.log("Fetched problem:", data);
     };
     fetchProblem();
   }, [problem_id, router]);
 
+  if (loading) return <PageLoader page="Code Details" />;
   if (!problem) return null;
 
   const hasCodes = Array.isArray(problem.codes) && problem.codes.length > 0;

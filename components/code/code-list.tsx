@@ -28,7 +28,7 @@ const CodeList: React.FC<CodeListProps> = ({
         return;
       }
       toast.success("Code deleted successfully");
-      router.refresh();
+      router.push(`/code/${problem_id}/view-code`);
     } catch (err) {
       toast.error("Failed to delete code");
     }

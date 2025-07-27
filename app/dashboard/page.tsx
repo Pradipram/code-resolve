@@ -6,6 +6,7 @@ import SearchInput from "@/components/dashboard/search-input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import PageLoader from "@/components/ui/PageLoader";
 import { filterProblemsFeild } from "@/data/ui/dashboard";
 import React, { useEffect, useState } from "react";
 
@@ -32,7 +33,7 @@ const Dashboard = () => {
   }, []);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <PageLoader page="Dashboard" />;
   }
 
   const handleDelete = (problemId: number) => {
