@@ -14,7 +14,7 @@ import { toast } from "react-toastify";
 
 interface DeleteAlertDialogProps {
   problemId: number;
-  onDelete?: (problemId: number) => void;
+  onDelete: (problemId: number) => void;
 }
 
 const DeleteAlertDialog: React.FC<DeleteAlertDialogProps> = ({

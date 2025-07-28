@@ -33,7 +33,7 @@ const AddProblem = () => {
       problemLink: "",
       platform: "leetcode",
       level: "medium",
-      status: "Unresolved",
+      status: "Unsolved",
     },
   });
 
@@ -45,7 +45,7 @@ const AddProblem = () => {
     if (link.includes("codeforces.com")) detected = "codeforces";
     else if (link.includes("leetcode.com")) detected = "leetcode";
     else if (link.includes("geeksforgeeks.org")) detected = "geeksforgeeks";
-    else if (link.includes("codestudio")) detected = "codestudio";
+    else if (link.includes("naukri.com")) detected = "codestudio";
     if (detected && form.getValues("platform") !== detected) {
       form.setValue(
         "platform",

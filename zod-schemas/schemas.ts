@@ -22,7 +22,7 @@ export const AddProblemFormSchema = z.object({
     z.enum(["easy", "medium", "hard"]),
     z.string().regex(/^[0-9]+$/, "Enter a valid number"),
   ]),
-  status: z.enum(["Solved", "Attempted", "Unresolved"]),
+  status: z.enum(["Solved", "Attempted", "Unsolved"]),
   note: z
     .string()
     .max(1000, "Note must be at most 1000 characters long")

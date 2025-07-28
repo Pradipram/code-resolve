@@ -13,22 +13,40 @@ import DeleteAlertDialog from "./delete-alert-dialog";
 import { toast } from "react-toastify";
 import { MessageSquare, SquareCode } from "lucide-react";
 import { ProblemInterface } from "@/data/types";
+import DialogLoader from "../ui/DialogLoader";
 
 interface ProblemListProps {
   problems: ProblemInterface[];
-  onDelete?: (problemId: number) => void;
+  onDelete: (problemId: number) => void;
+  onStatusChange: (problemId: number, status: string) => void;
 }
 
 const statusOptions = ["Unsolved", "Attempted", "Solved"];
+
+function getStatusBgClass(status: string) {
+  switch (status.toLowerCase()) {
+    case "solved":
+      return "bg-green-200 dark:bg-green-700";
+    case "attempted":
+      return "bg-yellow-200 dark:bg-yellow-700";
+    case "unsolved":
+      return "bg-red-200 dark:bg-red-700";
+    default:
+      return "bg-gray-100 dark:bg-gray-900";
+  }
+}
 
 function formatDate(dateStr: string) {
   const date = new Date(dateStr);
   return `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`;
 }
 
-const ProblemList: React.FC<ProblemListProps> = ({ problems, onDelete }) => {
-  const [localProblems, setLocalProblems] =
-    useState<ProblemInterface[]>(problems);
+const ProblemList: React.FC<ProblemListProps> = ({
+  problems,
+  onDelete,
+  onStatusChange,
+}) => {
+  // Remove localProblems state, use problems prop directly
 
   const [noteModal, setNoteModal] = useState<{
     open: boolean;
@@ -37,10 +55,12 @@ const ProblemList: React.FC<ProblemListProps> = ({ problems, onDelete }) => {
     saving: boolean;
     editing: boolean;
   }>({ open: false, problem: null, note: "", saving: false, editing: false });
+  const [isStatusChanging, setIsStatusChanging] = useState(false);
 
   // Update status in DB immediately on change
   const handleStatusChange = async (problemId: number, newStatus: string) => {
     try {
+      setIsStatusChanging(true);
       const res = await fetch("/api/problem", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -48,17 +68,8 @@ const ProblemList: React.FC<ProblemListProps> = ({ problems, onDelete }) => {
       });
       const result = await res.json();
       if (res.ok) {
-        setLocalProblems((prev) =>
-          prev.map((p) =>
-            p.problem_id === problemId
-              ? {
-                  ...p,
-                  status: newStatus,
-                  updated_at: new Date().toISOString(),
-                }
-              : p
-          )
-        );
+        // No local state update, rely on parent to update problems prop
+        if (onStatusChange) onStatusChange(problemId, newStatus);
       } else {
         toast.error(
           result.error || res.statusText || "Failed to update status"
@@ -67,7 +78,7 @@ const ProblemList: React.FC<ProblemListProps> = ({ problems, onDelete }) => {
     } catch (err) {
       toast.error("Error updating status");
     } finally {
-      // setSaving((prev) => ({ ...prev, [problemId]: false }));
+      setIsStatusChanging(false);
     }
   };
 
@@ -103,23 +114,7 @@ const ProblemList: React.FC<ProblemListProps> = ({ problems, onDelete }) => {
       if (res.ok) {
         toast.success("Note updated successfully");
         // Update the local problems list with the new note and updated_at
-        setLocalProblems((prev) => {
-          return prev
-            .map((p) =>
-              p.problem_id === noteModal.problem!.problem_id
-                ? {
-                    ...p,
-                    note: noteModal.note,
-                    updated_at: new Date().toISOString(),
-                  }
-                : p
-            )
-            .sort(
-              (a, b) =>
-                new Date(b.updated_at).getTime() -
-                new Date(a.updated_at).getTime()
-            );
-        });
+        // No local state update, rely on parent to update problems prop
         setNoteModal((prev) => ({
           ...prev,
           open: false,
@@ -138,6 +133,7 @@ const ProblemList: React.FC<ProblemListProps> = ({ problems, onDelete }) => {
 
   return (
     <div className="overflow-x-auto m-4">
+      <DialogLoader text="Changing Status" open={isStatusChanging} />
       <table className="min-w-full border border-gray-300 dark:border-gray-700 rounded-lg">
         <thead>
           <tr className="bg-gray-100 dark:bg-gray-800">
@@ -153,7 +149,7 @@ const ProblemList: React.FC<ProblemListProps> = ({ problems, onDelete }) => {
           </tr>
         </thead>
         <tbody>
-          {localProblems.map((problem) => (
+          {problems.map((problem) => (
             <tr key={problem.problem_id} className="border-t">
               <td className="px-4 py-2">
                 <a
@@ -173,7 +169,9 @@ const ProblemList: React.FC<ProblemListProps> = ({ problems, onDelete }) => {
                   onChange={(e) =>
                     handleStatusChange(problem.problem_id, e.target.value)
                   }
-                  className="border rounded px-2 py-1 bg-white dark:bg-gray-900 text-black dark:text-white"
+                  className={`border rounded px-2 py-1 text-black dark:text-white ${getStatusBgClass(
+                    problem.status
+                  )}`}
                 >
                   {statusOptions.map((opt) => (
                     <option key={opt} value={opt}>

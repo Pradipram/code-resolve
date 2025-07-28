@@ -20,6 +20,7 @@ export async function POST(req: Request) {
         platform: body.platform,
         level: body.level.toString(),
         status: body.status,
+        note: body.note || "",
       },
     });
 

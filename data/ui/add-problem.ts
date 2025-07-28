@@ -55,7 +55,7 @@ export const formArrayList: FormArrayListItem[] = [
     options: [
       { value: "Solved", label: "Solved" },
       { value: "Attempted", label: "Attempted" },
-      { value: "Unresolved", label: "Unresolved" },
+      { value: "Unsolved", label: "Unsolved" },
     ],
   },
   {

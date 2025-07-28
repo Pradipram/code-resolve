@@ -1,5 +1,4 @@
 export const filterProblemsFeild = [
-  { id: "all-problems", label: "All Problems", checked: true },
   { id: "codeforces", label: "Codeforces", checked: false },
   { id: "leetcode", label: "LeetCode", checked: false },
   { id: "codestudio", label: "CodeStudio", checked: false },
