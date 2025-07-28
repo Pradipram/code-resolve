@@ -12,7 +12,11 @@ export async function GET(
   try {
     const problem = await prisma.problem.findUnique({
       where: { problem_id: Number(problem_id) },
-      include: { codes: true },
+      include: {
+        codes: {
+          orderBy: { updated_at: "desc" },
+        },
+      },
     });
     if (!problem) {
       return NextResponse.json({ error: "Problem not found" }, { status: 404 });

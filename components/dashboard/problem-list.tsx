@@ -11,7 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import DeleteAlertDialog from "./delete-alert-dialog";
 import { toast } from "react-toastify";
-import { Code, MessageSquare, SquareCode } from "lucide-react";
+import { MessageSquare, SquareCode } from "lucide-react";
 import { ProblemInterface } from "@/data/types";
 
 interface ProblemListProps {
@@ -27,12 +27,9 @@ function formatDate(dateStr: string) {
 }
 
 const ProblemList: React.FC<ProblemListProps> = ({ problems, onDelete }) => {
-  const [saving, setSaving] = useState<{ [key: number]: boolean }>({});
   const [localProblems, setLocalProblems] =
     useState<ProblemInterface[]>(problems);
 
-  // Note modal state
-  const router = useRouter();
   const [noteModal, setNoteModal] = useState<{
     open: boolean;
     problem: ProblemInterface | null;
@@ -43,7 +40,6 @@ const ProblemList: React.FC<ProblemListProps> = ({ problems, onDelete }) => {
 
   // Update status in DB immediately on change
   const handleStatusChange = async (problemId: number, newStatus: string) => {
-    setSaving((prev) => ({ ...prev, [problemId]: true }));
     try {
       const res = await fetch("/api/problem", {
         method: "PUT",
@@ -71,7 +67,7 @@ const ProblemList: React.FC<ProblemListProps> = ({ problems, onDelete }) => {
     } catch (err) {
       toast.error("Error updating status");
     } finally {
-      setSaving((prev) => ({ ...prev, [problemId]: false }));
+      // setSaving((prev) => ({ ...prev, [problemId]: false }));
     }
   };
 

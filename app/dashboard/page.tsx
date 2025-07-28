@@ -33,7 +33,7 @@ const Dashboard = () => {
   }, []);
 
   if (loading) {
-    return <PageLoader page="Dashboard" />;
+    return <PageLoader text="Loading Dashboard" />;
   }
 
   const handleDelete = (problemId: number) => {

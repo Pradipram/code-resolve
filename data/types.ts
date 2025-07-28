@@ -54,6 +54,7 @@ export interface ProblemInterface {
   status: string;
   codeCount: number;
   note?: string | null;
+  codes: CodeInterface[]; // Optional, if you want to include codes in the proble
   created_at: string; // or Date
   updated_at: string; // or Date
 }
