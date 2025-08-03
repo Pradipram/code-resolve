@@ -160,10 +160,10 @@ const Dashboard = () => {
             <a href="/add-problem">
               <Button>Add New Problem</Button>
             </a>
-            <a href="/dsa">
+            <a href="/practice/dsa">
               <Button variant={"outline"}>Practice DSA</Button>
             </a>
-            <a href="/cp">
+            <a href="/practice/cp">
               <Button variant={"outline"}>Practice CP</Button>
             </a>
           </div>
