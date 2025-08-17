@@ -58,3 +58,13 @@ export interface ProblemInterface {
   created_at: string; // or Date
   updated_at: string; // or Date
 }
+
+export interface DSAProblemInterface {
+  id: number;
+  title: string;
+  urls: string[];
+  difficulty: string;
+  topics: string[];
+  sheets: string[];
+  company: string[];
+}
