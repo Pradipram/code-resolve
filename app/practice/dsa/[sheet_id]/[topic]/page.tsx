@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import DSAProblemListData from "@/data/DSAProblemList.json";
 import { DSAProblemInterface } from "@/data/types";
+import PageLoader from "@/components/ui/PageLoader";
 
 export function getProblemsBySheetAndTopic(sheetId: string, topic: string) {
   return (DSAProblemListData.DSAProblemList || []).filter(
@@ -24,6 +25,7 @@ const page = () => {
   const [dsaProblemList, setDsaProblemList] = useState<DSAProblemInterface[]>(
     []
   );
+  const [loading, setLoading] = useState(true);
   const params = useParams();
   const { sheet_id, topic } = params as { sheet_id?: string; topic?: string };
   useEffect(() => {
@@ -35,8 +37,9 @@ const page = () => {
       // console.log("Static Problems:", problems);
 
       // 2. Fetch user-specific problem status
-      let userData: any[] = [];
+      let userData: DSAProblemInterface[] = [];
       try {
+        setLoading(true);
         const res = await fetch(
           "/api/userProblemStatus/get-user-saved-problem"
         );
@@ -47,6 +50,8 @@ const page = () => {
         }
       } catch (err) {
         console.error("Error fetching user problems:", err);
+      } finally {
+        setLoading(false);
       }
       // console.log("User Data:", userData);
 
@@ -92,6 +97,9 @@ const page = () => {
       )
     );
   };
+  if (loading) {
+    return <PageLoader text="Loading Problems..." />;
+  }
 
   return (
     <div className="m-auto">

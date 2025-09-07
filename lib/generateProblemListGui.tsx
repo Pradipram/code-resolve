@@ -14,6 +14,7 @@ import { MessageSquare, SquareCode } from "lucide-react";
 import { usePathname } from "next/navigation";
 import React, { FC, useState } from "react";
 import { toast } from "react-toastify";
+import Image from "next/image";
 
 function getStatusBgClass(status: string) {
   switch (status.toLowerCase()) {
@@ -57,6 +58,18 @@ const GenerateProblemListGui: FC<GenerateProblemListGuiProps> = ({
     editing: boolean;
   }>({ open: false, problem: null, note: "", saving: false, editing: false });
   const pathname = usePathname();
+
+  const getIconsUrl = (url: string) => {
+    if (url.includes("leetcode"))
+      return "/images/icons/icons8-leetcode-100.png";
+    if (url.includes("geeksforgeeks"))
+      return "/images/icons/icons8-geeksforgeeks-100.png";
+    if (url.includes("codeforces"))
+      return "/images/icons/icons8-codeforces-100.png";
+    if (url.includes("codechef"))
+      return "/images/icons/icons8-codechef-100.png";
+    return "/images/icons/icons8-url-100.png";
+  };
 
   const handleStatusChange = async (problemId: number, newStatus: string) => {
     setIsStatusChanging(true);
@@ -194,7 +207,7 @@ const GenerateProblemListGui: FC<GenerateProblemListGuiProps> = ({
           {problemList &&
             problemList.map((problem) => (
               <tr key={problem.problem_id} className="border-t">
-                <td className="px-4 py-2">
+                <td className="px-4 py-2 max-w-[400px]">
                   {fromPage === "dashboard" ? (
                     <a
                       href={problem.problem_link}
@@ -291,16 +304,21 @@ const GenerateProblemListGui: FC<GenerateProblemListGuiProps> = ({
                       {problem.urls && problem.urls.length > 0 ? (
                         <ul className="list-disc pl-4">
                           {problem.urls.map((url, idx) => (
-                            <li key={idx}>
-                              <a
-                                href={url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-blue-600 hover:underline"
-                              >
-                                {url}
-                              </a>
-                            </li>
+                            <a
+                              key={idx}
+                              href={url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-block transform transition duration-200 hover:scale-110 hover:opacity-80 m-2"
+                            >
+                              <Image
+                                src={getIconsUrl(url)}
+                                alt={url}
+                                width={40}
+                                height={40}
+                                className="rounded-md"
+                              />
+                            </a>
                           ))}
                         </ul>
                       ) : (
@@ -309,11 +327,16 @@ const GenerateProblemListGui: FC<GenerateProblemListGuiProps> = ({
                     </td>
                     <td className="px-4 py-2">
                       {problem.companies && problem.companies.length > 0 ? (
-                        <ul className="list-disc pl-4">
+                        <div className="w-[300px] flex flex-wrap gap-2">
                           {problem.companies.map((company, idx) => (
-                            <li key={idx}>{company}</li>
+                            <span
+                              key={idx}
+                              className="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-full"
+                            >
+                              {company}
+                            </span>
                           ))}
-                        </ul>
+                        </div>
                       ) : (
                         <span>No Companies</span>
                       )}

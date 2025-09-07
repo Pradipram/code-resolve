@@ -68,6 +68,7 @@ export interface DSAProblemInterface {
   companies: string[];
   status: string;
   codeCount: number;
+  note?: string;
 }
 
 export interface CommonProblemInterface {
