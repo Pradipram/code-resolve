@@ -27,22 +27,54 @@ const page = () => {
   const params = useParams();
   const { sheet_id, topic } = params as { sheet_id?: string; topic?: string };
   useEffect(() => {
-    if (sheet_id && topic) {
+    const fetchProblems = async () => {
+      if (!sheet_id || !topic) return;
+
+      // 1. Get static problems from JSON
       const problems = getProblemsBySheetAndTopic(sheet_id, topic);
-      const mappedProblems: DSAProblemInterface[] = problems.map((problem) => ({
-        problem_id: problem.id,
-        problem_name: problem.title,
-        urls: problem.urls,
-        level: problem.difficulty,
-        topics: problem.topics,
-        sheets: problem.sheets,
-        companies: problem.company,
-        status: "Unsolved",
-        code: [],
-        codeCount: 0,
-      }));
+      // console.log("Static Problems:", problems);
+
+      // 2. Fetch user-specific problem status
+      let userData: any[] = [];
+      try {
+        const res = await fetch(
+          "/api/userProblemStatus/get-user-saved-problem"
+        );
+        if (res.ok) {
+          userData = await res.json();
+        } else {
+          console.error("Failed to fetch user problem data");
+        }
+      } catch (err) {
+        console.error("Error fetching user problems:", err);
+      }
+      // console.log("User Data:", userData);
+
+      // 3. Merge JSON problems with user-specific data
+      const mappedProblems: DSAProblemInterface[] = problems.map((problem) => {
+        const userProblem = userData.find(
+          (up) => Number(up.problem_id) === problem.id
+        );
+
+        return {
+          problem_id: problem.id,
+          problem_name: problem.title,
+          urls: problem.urls,
+          level: problem.difficulty,
+          topics: problem.topics,
+          sheets: problem.sheets,
+          companies: problem.company,
+          status: userProblem?.status || "Unsolved",
+          note: userProblem?.note || "",
+          codeCount: userProblem?.codeCount || 0,
+        };
+      });
+
+      // 4. Update state
       setDsaProblemList(mappedProblems);
-    }
+    };
+
+    fetchProblems();
   }, [sheet_id, topic]);
 
   const handleStatusChange = (problemId: number, status: string) => {
