@@ -20,6 +20,7 @@ interface CodeListProps {
   codes: Array<any>;
   problem_id: string | number;
   problem_name: string;
+  parent: string;
   onDelete: (codeId: string) => void;
 }
 
@@ -27,6 +28,7 @@ const CodeList: React.FC<CodeListProps> = ({
   codes,
   problem_id,
   problem_name,
+  parent,
   onDelete,
 }) => {
   const router = useRouter();
@@ -64,7 +66,7 @@ const CodeList: React.FC<CodeListProps> = ({
         <a
           href={`/code/${problem_id}/add-code?from=view-code&problem_name=${encodeURIComponent(
             problem_name
-          )}`}
+          )}&parent=${parent}`}
         >
           <Button
             variant="outline"

@@ -1,7 +1,6 @@
 "use client";
 
 import EmptyDashboard from "@/components/dashboard/empty-dashboard";
-import ProblemList from "@/components/dashboard/problem-list";
 import SearchInput from "@/components/dashboard/search-input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -9,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import PageLoader from "@/components/ui/PageLoader";
 import { ProblemInterface } from "@/data/types";
 import { filterProblemsFeild } from "@/data/ui/dashboard";
+import GenerateProblemListGui from "@/lib/generateProblemListGui";
 import React, { useEffect, useState } from "react";
 
 const Dashboard = () => {
@@ -51,6 +51,14 @@ const Dashboard = () => {
     setProblems((prev: ProblemInterface[]) =>
       prev.map((p: ProblemInterface) =>
         p.problem_id === problemId ? { ...p, status } : p
+      )
+    );
+  };
+
+  const handleNoteChange = (problemId: number, note: string) => {
+    setProblems((prev: ProblemInterface[]) =>
+      prev.map((p: ProblemInterface) =>
+        p.problem_id === problemId ? { ...p, note } : p
       )
     );
   };
@@ -120,10 +128,17 @@ const Dashboard = () => {
           {/* Code for problemslist on the left side of the dashboard */}
           <div className="flex-1">
             <h1 className="text-center">Your saved problems</h1>
-            <ProblemList
+            {/* <ProblemList
               problems={filteredProblems}
               onDelete={handleDelete}
               onStatusChange={handleStatusChange}
+            /> */}
+            <GenerateProblemListGui
+              problemList={filteredProblems}
+              fromPage="dashboard"
+              onStatusChange={handleStatusChange}
+              onNoteChange={handleNoteChange}
+              onDelete={handleDelete}
             />
           </div>
           {/* Code for filter and search on the right side of the dashboard */}

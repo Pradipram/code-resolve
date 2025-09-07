@@ -2,17 +2,23 @@
 import EmptyCode from "@/components/code/empty-code";
 import CodeList from "@/components/code/code-list";
 import PageLoader from "@/components/ui/PageLoader";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { CodeInterface, ProblemInterface } from "@/data/types";
+import {
+  CodeInterface,
+  CommonProblemInterface,
+  ProblemInterface,
+} from "@/data/types";
 
 const page = () => {
   const { problem_id } = useParams();
-  const [problem, setProblem] = useState<ProblemInterface | null>(null);
+  const [problem, setProblem] = useState<CommonProblemInterface | null>(null);
   const [codes, setCodes] = useState<CodeInterface[]>([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const from = searchParams.get("from") || "add-code";
 
   useEffect(() => {
     if (!problem_id) {
@@ -24,13 +30,24 @@ const page = () => {
     }
     const fetchProblem = async () => {
       setLoading(true);
-      const response = await fetch(`/api/problem/${problem_id}`);
+      let response;
+      if (from === "dashboard") {
+        response = await fetch(`/api/problem/${problem_id}`);
+      } else if (from === "topic") {
+        response = await fetch(
+          `/api/userProblemStatus/${problem_id}/get-details`
+        );
+      } else {
+        toast.error("redirected from wrong page.");
+        return;
+      }
       if (!response.ok) {
         toast.error("Failed to fetch problem");
         setLoading(false);
         return;
       }
       const data = await response.json();
+      console.log("Fetched problem data:", data);
       setProblem(data);
       setCodes(data.codes || []);
       setLoading(false);
@@ -53,12 +70,14 @@ const page = () => {
           codes={codes}
           problem_id={problem_id as string | number}
           problem_name={problem.problem_name || ""}
+          parent={from}
           onDelete={onDelete}
         />
       ) : (
         <EmptyCode
           problem_id={problem_id as string | number}
           problem_name={problem.problem_name || ""}
+          parent={from}
         />
       )}
     </div>

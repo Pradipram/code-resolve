@@ -15,7 +15,8 @@ datasource db {
 
 model Code {
   code_id     String   @id @default(uuid())
-  problem_id  Int
+  problem_id  Int?
+  user_problem_status_id Int? 
   title       String
   language    CodeLanguage
   note        String?
@@ -23,14 +24,17 @@ model Code {
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
 
-  Problem     Problem  @relation(fields: [problem_id], references: [problem_id])
+  Problem     Problem?  @relation(fields: [problem_id], references: [problem_id])
+  UserProblemStatus UserProblemStatus? @relation(fields: [user_problem_status_id], references: [id])
 }
 
 model UserProblemStatus {
+  id         Int @unique @default(autoincrement())
   user_id    String
   problem_id String
   status     String
-  topic      String
+  codes      Code[]
+  note       String?
 
   @@id([user_id, problem_id])
 }

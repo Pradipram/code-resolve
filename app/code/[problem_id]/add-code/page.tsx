@@ -17,6 +17,7 @@ const AddCodePage = () => {
   const searchParams = useSearchParams();
   const from = searchParams.get("from") || "view-code";
   const problemName = searchParams.get("problem_name") || "";
+  const parent = searchParams.get("parent") || "add-code";
   const { problem_id } = useParams();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -30,14 +31,31 @@ const AddCodePage = () => {
     },
   });
 
+  if (!parent) {
+    toast.error(
+      "Redirected from wrong page. Please report this issue to github."
+    );
+    router.push("/dashboard");
+    return null;
+  }
+
   const handleAdd = async (values: z.infer<typeof AddCodeFormSchema>) => {
     setIsLoading(true);
     try {
-      const res = await fetch(`/api/code/${problem_id}/add-code`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
-      });
+      let res;
+      if (parent === "topic") {
+        res = await fetch(`/api/userProblemStatus/${problem_id}/add-code`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(values),
+        });
+      } else {
+        res = await fetch(`/api/code/${problem_id}/add-code`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(values),
+        });
+      }
       console.log("Response:", res);
       if (!res.ok) {
         if (res.status === 500) {
@@ -50,7 +68,7 @@ const AddCodePage = () => {
         if (from === "add-problem") {
           router.push("/dashboard");
         } else {
-          router.push(`/code/${problem_id}/view-code`);
+          router.push(`/code/${problem_id}/view-code?from=${parent}`);
         }
       }
     } catch (err) {
@@ -64,7 +82,7 @@ const AddCodePage = () => {
 
   const handleSkip = () => {
     if (from === "view-code") {
-      router.push(`/code/${problem_id}/view-code`);
+      router.push(`/code/${problem_id}/view-code?from=${parent}`);
     } else {
       router.push("/dashboard");
     }

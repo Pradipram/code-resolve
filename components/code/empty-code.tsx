@@ -5,9 +5,14 @@ import { Button } from "../ui/button";
 interface EmptyCodeProps {
   problem_id: string | number;
   problem_name: string;
+  parent: string;
 }
 
-const EmptyCode: React.FC<EmptyCodeProps> = ({ problem_id, problem_name }) => {
+const EmptyCode: React.FC<EmptyCodeProps> = ({
+  problem_id,
+  problem_name,
+  parent,
+}) => {
   return (
     <div className="flex flex-col items-center justify-center h-full py-16">
       <FileQuestion size={64} className="mb-6 text-gray-400" />
@@ -24,7 +29,7 @@ const EmptyCode: React.FC<EmptyCodeProps> = ({ problem_id, problem_name }) => {
         Click "Add Code" to get started!
       </p>
       <a
-        href={`/code/${problem_id}/add-code/?from=view-code&problem_name=${problem_name}`}
+        href={`/code/${problem_id}/add-code/?from=view-code&problem_name=${problem_name}&parent=${parent}`}
       >
         <Button variant={"link"}>Add Code</Button>
       </a>

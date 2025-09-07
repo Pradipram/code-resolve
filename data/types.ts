@@ -54,17 +54,42 @@ export interface ProblemInterface {
   status: string;
   codeCount: number;
   note?: string | null;
-  codes: CodeInterface[]; // Optional, if you want to include codes in the proble
   created_at: string; // or Date
   updated_at: string; // or Date
 }
 
 export interface DSAProblemInterface {
-  id: number;
-  title: string;
+  problem_id: number;
+  problem_name: string;
   urls: string[];
-  difficulty: string;
+  level: string;
   topics: string[];
   sheets: string[];
-  company: string[];
+  companies: string[];
+  status: string;
+  codeCount: number;
+}
+
+export interface CommonProblemInterface {
+  problem_id: number;
+  problem_name: string;
+  problem_link?: string;
+  platform?: string;
+  level?: string;
+  status: string;
+  codeCount: number;
+  note?: string | null;
+  created_at?: string;
+  updated_at?: string;
+  urls?: string[];
+  companies?: string[];
+}
+
+export const statusOptions = ["Unsolved", "Revisit", "Solved"];
+
+export interface UserProblemStatusUpdatingInterface {
+  status?: string;
+  code?: string;
+  note?: string;
+  topic?: string;
 }

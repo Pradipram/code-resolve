@@ -6,7 +6,7 @@ export async function POST(
   { params }: { params: { problem_id: string } }
 ) {
   const { problem_id } = params;
-  console.log("Adding code for problem_id:", problem_id);
+  // console.log("Adding code for problem_id:", problem_id);
   try {
     const body = await req.json();
     const newCode = await prisma.code.create({
