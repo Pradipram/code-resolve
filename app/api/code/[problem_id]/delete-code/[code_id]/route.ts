@@ -3,10 +3,14 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { problem_id: string; code_id: string } }
+  context: { params: Promise<{ problem_id: string; code_id: string }> }
 ) {
   try {
-    const { problem_id, code_id } = params;
+    const params = await context.params;
+    const { problem_id, code_id } = params ?? {};
+    if (!problem_id || !code_id) {
+      return NextResponse.json({ error: "Missing params" }, { status: 400 });
+    }
     // Delete the code entry with matching code_id and problem_id
     const deleted = await prisma.code.deleteMany({
       where: {
@@ -20,12 +24,12 @@ export async function DELETE(
 
     // Update the updated_at of the related problem
     await prisma.problem.update({
-      where: { problem_id: Number(params.problem_id) },
+      where: { problem_id: Number(problem_id) },
       data: { updated_at: new Date() },
     });
 
     return NextResponse.json({ success: true });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Failed to delete code" },
       { status: 500 }

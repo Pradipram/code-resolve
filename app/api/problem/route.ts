@@ -136,7 +136,12 @@ export async function PUT(req: Request) {
     }
 
     // Build update data dynamically
-    const updateData: any = { updated_at: new Date() };
+    const updateData: Partial<{
+      status: string;
+      code: string;
+      note: string;
+      updated_at: Date;
+    }> = { updated_at: new Date() };
     if (body.status !== undefined) updateData.status = body.status;
     if (body.code !== undefined) updateData.code = body.code;
     if (body.note !== undefined) updateData.note = body.note;

@@ -102,7 +102,7 @@ const GenerateProblemListGui: FC<GenerateProblemListGuiProps> = ({
           result.error || res.statusText || "Failed to update status"
         );
       }
-    } catch (error) {
+    } catch {
       toast.error("Error updating status");
     } finally {
       setIsStatusChanging(false);
@@ -170,7 +170,7 @@ const GenerateProblemListGui: FC<GenerateProblemListGuiProps> = ({
         toast.error(result.error || res.statusText || "Failed to update note");
         setNoteModal((prev) => ({ ...prev, saving: false }));
       }
-    } catch (err) {
+    } catch {
       toast.error("Error updating note");
       setNoteModal((prev) => ({ ...prev, saving: false }));
     }

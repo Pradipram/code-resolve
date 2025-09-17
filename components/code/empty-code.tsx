@@ -1,5 +1,6 @@
 import { FileQuestion } from "lucide-react";
 import React from "react";
+import Link from "next/link";
 import { Button } from "../ui/button";
 
 interface EmptyCodeProps {
@@ -20,19 +21,19 @@ const EmptyCode: React.FC<EmptyCodeProps> = ({
         No code added yet
       </h2>
       <p className="text-gray-500 dark:text-gray-400 mb-4 text-center">
-        You haven't added any code for this problem .
+        You haven&apos;t added any code for this problem .
         <br />
         <span className="font-semibold">
           [{problem_id}] {problem_name}
         </span>
         <br />
-        Click "Add Code" to get started!
+        Click &quot;Add Code&quot; to get started!
       </p>
-      <a
+      <Link
         href={`/code/${problem_id}/add-code/?from=view-code&problem_name=${problem_name}&parent=${parent}`}
       >
         <Button variant={"link"}>Add Code</Button>
-      </a>
+      </Link>
     </div>
   );
 };

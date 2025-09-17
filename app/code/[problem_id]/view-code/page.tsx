@@ -5,13 +5,9 @@ import PageLoader from "@/components/ui/PageLoader";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import {
-  CodeInterface,
-  CommonProblemInterface,
-  ProblemInterface,
-} from "@/data/types";
+import { CodeInterface, CommonProblemInterface } from "@/data/types";
 
-const page = () => {
+const Viewcode = () => {
   const { problem_id } = useParams();
   const [problem, setProblem] = useState<CommonProblemInterface | null>(null);
   const [codes, setCodes] = useState<CodeInterface[]>([]);
@@ -54,7 +50,7 @@ const page = () => {
       // console.log("Fetched problem:", data);
     };
     fetchProblem();
-  }, [problem_id, router]);
+  }, [problem_id, router, from]);
 
   const onDelete = (codeId: string) => {
     setCodes((prev) => prev.filter((c) => c.code_id !== codeId));
@@ -84,4 +80,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Viewcode;

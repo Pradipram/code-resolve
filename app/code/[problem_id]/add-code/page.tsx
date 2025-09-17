@@ -1,16 +1,32 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { Form } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { AddCodeFormSchema } from "@/zod-schemas/schemas";
 import { AddCodeFormFields, extToLang } from "@/data/ui/add-code";
-import { generateFormUI } from "@/lib/generateFormUI";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
 import { toast } from "react-toastify";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import MonacoEditor from "@/components/ui/MonacoEditor";
 
 const AddCodePage = () => {
   const router = useRouter();
@@ -20,6 +36,7 @@ const AddCodePage = () => {
   const parent = searchParams.get("parent") || "add-code";
   const { problem_id } = useParams();
   const [isLoading, setIsLoading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const AddCodeForm = useForm<z.infer<typeof AddCodeFormSchema>>({
     resolver: zodResolver(AddCodeFormSchema),
@@ -88,6 +105,27 @@ const AddCodePage = () => {
     }
   };
 
+  const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const extension = file.name.split(".").pop()?.toLowerCase();
+    // Map file extension to language
+    const detectedLang =
+      extension && extToLang[extension] ? extToLang[extension] : undefined;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      if (detectedLang) {
+        AddCodeForm.setValue("language", detectedLang);
+        console.log("Detected language:", detectedLang);
+      }
+      const text = event.target?.result as string;
+      AddCodeForm.setValue("code", text || "");
+    };
+    reader.readAsText(file);
+    // Reset input so same file can be uploaded again if needed
+    e.target.value = "";
+  };
+
   return (
     <div className="w-full max-w-3xl rounded-xl border p-6 shadow bg-white dark:bg-gray-900 mx-auto my-6">
       <h2 className="text-lg font-bold mb-4 text-center">
@@ -99,10 +137,89 @@ const AddCodePage = () => {
           onSubmit={AddCodeForm.handleSubmit(handleAdd)}
           className="space-y-6"
         >
-          {generateFormUI({
+          {/* {GenerateFormUI({
             form: AddCodeForm,
             fields: AddCodeFormFields,
-          })}
+          })} */}
+          {AddCodeFormFields.map((item) => (
+            <FormField
+              key={item.name}
+              control={AddCodeForm.control}
+              name={item.name}
+              render={({ field }) => (
+                <FormItem className="flex items-center gap-4 w-full">
+                  <FormLabel className="w-1/4 text-center gap-4">
+                    {item.label}
+                  </FormLabel>
+                  <div className="w-3/4">
+                    <FormControl>
+                      <div className="flex items-center gap-2">
+                        {item.type === "input" && (
+                          <Input placeholder={item.placeholder} {...field} />
+                        )}
+                        {item.type === "select" && (
+                          <Select
+                            value={field.value}
+                            onValueChange={(value) => field.onChange(value)}
+                          >
+                            <SelectTrigger>
+                              <SelectValue
+                                placeholder={
+                                  item.placeholder || "Choose an option"
+                                }
+                              />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {item.options?.map((option) => (
+                                <SelectItem key={option} value={option}>
+                                  {option}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        )}
+                        {item.type === "textarea" && (
+                          <Textarea {...field} placeholder={item.placeholder} />
+                        )}
+                        {item.type === "code" && (
+                          <div className="flex-col w-full">
+                            <MonacoEditor
+                              value={field.value}
+                              language={AddCodeForm.watch("language") as string}
+                              height="200px"
+                              theme="vs-dark"
+                              onChange={(value) => field.onChange(value || "")}
+                            />
+                            {fileInputRef && handleUpload && (
+                              <>
+                                <Button
+                                  type="button"
+                                  variant="link"
+                                  size="sm"
+                                  className="ml-2"
+                                  onClick={() => fileInputRef.current?.click()}
+                                >
+                                  Add code from file
+                                </Button>
+                                <input
+                                  ref={fileInputRef}
+                                  type="file"
+                                  accept=".txt,.cpp,.py,.js,.ts,.java,.c,.cs,.go,.rb,.rs,.swift,.kt,.php,.sh,.json,.md,.html,.css,.xml,.sql,.yaml,.yml,.pl,.r,.scala,.dart,.m,.vb,.lua,.hs,.jl,.tsx,.jsx"
+                                  style={{ display: "none" }}
+                                  onChange={handleUpload}
+                                />
+                              </>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </div>
+                </FormItem>
+              )}
+            />
+          ))}
           <div className="flex justify-center gap-4">
             <Button type="submit">
               {isLoading ? "Adding..." : "Add Code"}

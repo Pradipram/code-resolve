@@ -4,14 +4,15 @@ import { NextResponse } from "next/server";
 
 export async function POST(
   req: Request,
-  { params }: { params: { problem_id: string } }
+  context: { params: Promise<{ problem_id: string }> }
 ) {
   const { userId } = await auth();
   if (!userId) {
     return NextResponse.redirect(new URL("/sign-in", req.url));
   }
 
-  const { problem_id } = params;
+  const params = await context.params;
+  const problem_id = params?.problem_id;
   if (!problem_id) {
     return NextResponse.json(
       { error: "Problem ID is required" },

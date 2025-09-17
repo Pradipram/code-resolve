@@ -28,7 +28,7 @@ export async function GET(req: Request) {
       codeCount: p._count.codes,
     }));
     return NextResponse.json(problemsWithCodeCount);
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Something went wrong" },
       { status: 500 }

@@ -26,8 +26,8 @@ const EmptyDashboard = () => {
           No problems saved yet
         </h3>
         <p className="text-gray-600 dark:text-gray-400">
-          You haven't saved any coding problems yet. Start practicing DSA or
-          competitive programming problems to build your collection.
+          You haven&apos;t saved any coding problems yet. Start practicing DSA
+          or competitive programming problems to build your collection.
         </p>
         <div className="flex flex-wrap gap-4 justify-center">
           <Button variant="default">Browse DSA Problems</Button>

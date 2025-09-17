@@ -39,7 +39,7 @@ const DeleteAlertDialog: React.FC<DeleteAlertDialogProps> = ({
           errorData.error || res.statusText || "Failed to delete problem"
         );
       }
-    } catch (error) {
+    } catch {
       toast.error("Error deleting problem");
     }
   };

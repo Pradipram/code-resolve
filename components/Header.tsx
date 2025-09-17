@@ -1,6 +1,7 @@
 "use client";
 import { useClerk, UserButton } from "@clerk/nextjs";
 import Image from "next/image";
+import Link from "next/link";
 import React from "react";
 import { Button } from "./ui/button";
 import { ModeToggle } from "./ui/modeToggle";
@@ -11,25 +12,25 @@ const Header = () => {
   return (
     <header className="flex items-center justify-between p-2 bg-gray-800 shadow-md border-b-2 border-white">
       <div className="flex items-center">
-        <a href="/">
+        <Link href="/">
           <Image
             src="/images/logo_white.png"
             alt="Logo"
             width={50}
             height={50}
           />
-        </a>
+        </Link>
         <div>
-          <a href="/dashboard">
+          <Link href="/dashboard">
             <Button variant={"link"} className="text-white">
               Dashboard
             </Button>
-          </a>
-          <a href="/progress">
+          </Link>
+          <Link href="/progress">
             <Button variant={"link"} className="text-white">
               Progress
             </Button>
-          </a>
+          </Link>
         </div>
       </div>
       <div className="flex items-center space-x-4 ">
@@ -37,9 +38,9 @@ const Header = () => {
         {isSignedIn ? (
           <UserButton signInUrl="/sign-in" />
         ) : (
-          <a href="/sign-in">
+          <Link href="/sign-in">
             <Button variant={"outline"}>Sign In</Button>
-          </a>
+          </Link>
         )}
       </div>
     </header>

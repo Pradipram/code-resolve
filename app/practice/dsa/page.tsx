@@ -69,8 +69,8 @@ const DSAPracticePage = () => {
           </h2>
           <p className="text-lg text-center text-gray-600 dark:text-gray-300 mb-12 max-w-3xl mx-auto">
             Data Structures and Algorithms form the backbone of computer science
-            and software engineering. Here's why they're essential for your
-            growth:
+            and software engineering. Here&apos;s why they&apos;re essential for
+            your growth:
           </p>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">

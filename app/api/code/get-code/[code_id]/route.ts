@@ -3,9 +3,10 @@ import prisma from "@/lib/prisma";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { code_id: string } }
+  context: { params: Promise<{ code_id: string }> }
 ) {
-  const { code_id } = params;
+  const params = await context.params;
+  const code_id = params?.code_id;
   if (!code_id) {
     return NextResponse.json({ error: "Missing code_id" }, { status: 400 });
   }
@@ -27,7 +28,7 @@ export async function GET(
       return NextResponse.json({ error: "Code not found" }, { status: 404 });
     }
     return NextResponse.json(code);
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }

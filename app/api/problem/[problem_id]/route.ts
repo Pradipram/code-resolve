@@ -3,9 +3,10 @@ import { NextResponse } from "next/server";
 
 export async function GET(
   req: Request,
-  { params }: { params: { problem_id: string } }
+  context: { params: Promise<{ problem_id: string }> }
 ) {
-  const { problem_id } = params;
+  const params = await context.params;
+  const problem_id = params?.problem_id;
   if (!problem_id) {
     return NextResponse.json({ error: "Missing problem_id" }, { status: 400 });
   }
@@ -22,7 +23,7 @@ export async function GET(
       return NextResponse.json({ error: "Problem not found" }, { status: 404 });
     }
     return NextResponse.json(problem);
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }

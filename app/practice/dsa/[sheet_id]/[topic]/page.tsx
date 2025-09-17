@@ -7,7 +7,7 @@ import DSAProblemListData from "@/data/DSAProblemList.json";
 import { DSAProblemInterface } from "@/data/types";
 import PageLoader from "@/components/ui/PageLoader";
 
-export function getProblemsBySheetAndTopic(sheetId: string, topic: string) {
+function getProblemsBySheetAndTopic(sheetId: string, topic: string) {
   return (DSAProblemListData.DSAProblemList || []).filter(
     (problem) =>
       problem.sheets &&
@@ -21,7 +21,7 @@ export function getProblemsBySheetAndTopic(sheetId: string, topic: string) {
   );
 }
 
-const page = () => {
+const TopicPage = () => {
   const [dsaProblemList, setDsaProblemList] = useState<DSAProblemInterface[]>(
     []
   );
@@ -113,4 +113,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default TopicPage;

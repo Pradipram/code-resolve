@@ -1,7 +1,6 @@
 import { Plus, Edit, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "react-toastify";
-import { useRouter } from "next/navigation";
 import DialogLoader from "../ui/DialogLoader";
 import { useState } from "react";
 import {
@@ -15,9 +14,10 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "../ui/alert-dialog";
+import { CodeInterface } from "@/data/types";
 
 interface CodeListProps {
-  codes: Array<any>;
+  codes: CodeInterface[];
   problem_id: string | number;
   problem_name: string;
   parent: string;
@@ -31,7 +31,6 @@ const CodeList: React.FC<CodeListProps> = ({
   parent,
   onDelete,
 }) => {
-  const router = useRouter();
   const [deleting, setDeleting] = useState(false);
 
   const handleDelete = async (codeId: string) => {
@@ -41,15 +40,15 @@ const CodeList: React.FC<CodeListProps> = ({
         method: "DELETE",
       });
       if (!res.ok) {
-        const err = await res.json();
-        toast.error(err?.error || "Failed to delete code");
+        const errorResponse = await res.json();
+        toast.error(errorResponse?.error || "Failed to delete code");
         return;
       }
       toast.success("Code deleted successfully");
       onDelete(codeId);
       // router.refresh();
       // window.location.reload();
-    } catch (err) {
+    } catch {
       toast.error("Failed to delete code");
     } finally {
       setDeleting(false);
@@ -79,7 +78,7 @@ const CodeList: React.FC<CodeListProps> = ({
         </a>
       </div>
       <ul className="divide-y divide-gray-200 dark:divide-gray-700 flex flex-col gap-6">
-        {codes.map((code: any) => (
+        {codes.map((code) => (
           <li
             key={code.code_id}
             className="py-4 px-2 flex flex-col gap-1 relative border rounded-lg shadow-lg"
@@ -106,7 +105,9 @@ const CodeList: React.FC<CodeListProps> = ({
               <a
                 href={`/code/edit-code/${
                   code.code_id
-                }?problem_name=${encodeURIComponent(problem_name)}`}
+                }?problem_name=${encodeURIComponent(
+                  problem_name
+                )}&parent=${parent}`}
               >
                 <Button variant="ghost" size="icon" title="Edit Code">
                   <Edit className="w-4 h-4" />

@@ -1,6 +1,7 @@
 "use client";
 
 import EmptyDashboard from "@/components/dashboard/empty-dashboard";
+import Link from "next/link";
 import SearchInput from "@/components/dashboard/search-input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -29,7 +30,7 @@ const Dashboard = () => {
           setProblems(data);
           console.log("Fetched problems:", data);
         }
-      } catch (err) {
+      } catch {
         // handle error
       } finally {
         setLoading(false);
@@ -44,7 +45,7 @@ const Dashboard = () => {
 
   // Handle delete action locally for instant UI update
   const handleDelete = (problemId: number) => {
-    setProblems((prev) => prev.filter((p: any) => p.problem_id !== problemId));
+    setProblems((prev) => prev.filter((p) => p.problem_id !== problemId));
   };
 
   const handleStatusChange = (problemId: number, status: string) => {
@@ -69,12 +70,12 @@ const Dashboard = () => {
   // 1. Filter by search (problem name only)
   if (s) {
     filteredProblems = filteredProblems.filter(
-      (p: any) => p.problem_name && p.problem_name.toLowerCase().includes(s)
+      (p) => p.problem_name && p.problem_name.toLowerCase().includes(s)
     );
   }
   // 2. Filter by checked checkboxes
   if (checkedFilters.length > 0) {
-    filteredProblems = filteredProblems.filter((p: any) => {
+    filteredProblems = filteredProblems.filter((p) => {
       // Platform filters
       const platformFilters = [
         "codeforces",
@@ -172,15 +173,15 @@ const Dashboard = () => {
                 </div>
               </div>
             </div>
-            <a href="/add-problem">
+            <Link href="/add-problem">
               <Button>Add New Problem</Button>
-            </a>
-            <a href="/practice/dsa">
+            </Link>
+            <Link href="/practice/dsa">
               <Button variant={"outline"}>Practice DSA</Button>
-            </a>
-            <a href="/practice/cp">
+            </Link>
+            <Link href="/practice/cp">
               <Button variant={"outline"}>Practice CP</Button>
-            </a>
+            </Link>
           </div>
         </div>
       ) : (

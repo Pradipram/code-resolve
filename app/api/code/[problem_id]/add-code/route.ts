@@ -3,10 +3,15 @@ import { NextResponse } from "next/server";
 
 export async function POST(
   req: Request,
-  { params }: { params: { problem_id: string } }
+  context: { params: Promise<{ problem_id: string }> }
 ) {
-  const { problem_id } = params;
+  // Await params because Next's RouteContext provides params as a Promise
+  const params = await context.params;
+  const problem_id = params?.problem_id;
   // console.log("Adding code for problem_id:", problem_id);
+  if (!problem_id) {
+    return NextResponse.json({ error: "Missing problem_id" }, { status: 400 });
+  }
   try {
     const body = await req.json();
     const newCode = await prisma.code.create({
@@ -26,7 +31,7 @@ export async function POST(
     });
 
     return NextResponse.json(newCode);
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: "Failed to add code" }, { status: 500 });
   }
 }

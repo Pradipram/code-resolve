@@ -12,6 +12,7 @@ const EditPage = () => {
   const { code_id } = useParams();
   const searchParms = useSearchParams();
   const problemName = searchParms.get("problem_name") || "";
+  const parent = searchParms.get("parent") || "";
   const [code, setCode] = useState<CodeType | null>(null);
   const [saving, setSaving] = useState(false);
   const router = useRouter();
@@ -53,10 +54,14 @@ const EditPage = () => {
       setCode(data);
       toast.success("Code updated successfully!");
       setTimeout(() => {
-        router.push(`/code/${code.problem_id}/view-code`);
+        router.push(`/code/${code.problem_id}/view-code/?from=${parent}`);
       }, 1200);
-    } catch (error: any) {
-      toast.error(error?.message || "Error saving changes");
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("Error saving changes");
+      }
       setSaving(false);
     }
   };

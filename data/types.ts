@@ -94,3 +94,17 @@ export interface UserProblemStatusUpdatingInterface {
   note?: string;
   topic?: string;
 }
+
+// export type GenerateFormType = {
+//   status: "Unsolved" | "Solved" | "Attempted";
+//   level: string;
+//   platform: "codeforces" | "leetcode" | "geeksforgeeks" | "codestudio";
+//   problemName: string;
+//   problemLink: string;
+//   note?: string;
+//   language?: string;
+//   code?: string;
+//   title?: string;
+// };
+
+// export type GenerateFormFieldName = keyof GenerateFormType;

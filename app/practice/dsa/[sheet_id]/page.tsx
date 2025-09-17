@@ -1,13 +1,14 @@
 "use client";
 
 import React, { useMemo } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { BookOpen, ArrowRight, Shuffle } from "lucide-react";
-import DSAProblemListData from "@/data/DSAProblemList.json";
+import DSAProblemListData from "@/data/DSAProblemListv2.json";
 import { dsaSheets } from "@/data/ui/practice-dsa";
+import { DSAProblemInterface } from "@/data/types";
 
 const getSheetMeta = (sheetId: string) => {
   return dsaSheets.find(
@@ -25,9 +26,9 @@ const getSheetProblems = (sheetId: string) => {
   );
 };
 
-const getSheetTopics = (problems: any[]) => {
+const getSheetTopics = (problems: DSAProblemInterface[]) => {
   const topicSet = new Set<string>();
-  problems.forEach((problem: any) => {
+  problems.forEach((problem) => {
     if (problem.topics) {
       (problem.topics as string[]).forEach((topic: string) =>
         topicSet.add(topic)
@@ -39,7 +40,6 @@ const getSheetTopics = (problems: any[]) => {
 
 const DSASheetPage = () => {
   const params = useParams();
-  const router = useRouter();
   const sheetId = typeof params.sheet_id === "string" ? params.sheet_id : "";
 
   const sheetMeta = useMemo(() => getSheetMeta(sheetId), [sheetId]);
