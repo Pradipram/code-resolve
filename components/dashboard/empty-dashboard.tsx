@@ -1,5 +1,6 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 const EmptyDashboard = () => {
   return (
@@ -30,12 +31,12 @@ const EmptyDashboard = () => {
           or competitive programming problems to build your collection.
         </p>
         <div className="flex flex-wrap gap-4 justify-center">
-          <a href="/practice/dsa">
+          <Link href="/practice/dsa">
             <Button variant="default">Browse DSA Problems</Button>
-          </a>
-          <a href="/practice/cp">
+          </Link>
+          <Link href="/practice/cp">
             <Button variant="outline">Try Competitive Programming</Button>
-          </a>
+          </Link>
         </div>
         <span>--OR--</span>
         <div>
