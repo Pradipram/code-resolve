@@ -185,7 +185,9 @@ const Dashboard = () => {
           </div>
         </div>
       ) : (
-        <EmptyDashboard />
+        <div className="flex items-center justify-center h-full w-full mt-3">
+          <EmptyDashboard />
+        </div>
       )}
     </div>
   );

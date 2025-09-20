@@ -30,8 +30,12 @@ const EmptyDashboard = () => {
           or competitive programming problems to build your collection.
         </p>
         <div className="flex flex-wrap gap-4 justify-center">
-          <Button variant="default">Browse DSA Problems</Button>
-          <Button variant="outline">Try Competitive Programming</Button>
+          <a href="/practice/dsa">
+            <Button variant="default">Browse DSA Problems</Button>
+          </a>
+          <a href="/practice/cp">
+            <Button variant="outline">Try Competitive Programming</Button>
+          </a>
         </div>
         <span>--OR--</span>
         <div>

@@ -61,7 +61,7 @@ const AddProblem = () => {
     else if (link.includes("leetcode.com")) detected = "leetcode";
     else if (link.includes("geeksforgeeks.org")) detected = "geeksforgeeks";
     else if (link.includes("naukri.com")) detected = "codestudio";
-    if (detected && form.getValues("platform") !== detected) {
+    if (detected) {
       form.setValue(
         "platform",
         detected as "codeforces" | "leetcode" | "geeksforgeeks" | "codestudio"
